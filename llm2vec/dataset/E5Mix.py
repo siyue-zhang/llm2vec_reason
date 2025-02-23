@@ -12,7 +12,7 @@ E5_EMBEDDING_PROMPTS = {
         "Given a premise, retrieve a hypothesis that is entailed by the premise",
         "Retrieve semantically similar text",
     ],
-    "dureader": "Given a Chinese search query, retrieve web passages that answer the question",
+    # "dureader": "Given a Chinese search query, retrieve web passages that answer the question",
     "eli5_question_answer": "Provided a user question, retrieve the highest voted answers on Reddit ELI5 forum",
     "fever": "Given a claim, retrieve documents that support or refute the claim",
     "hotpot_qa": "Given a multi-hop question, retrieve documents that can help answer the question",
@@ -26,7 +26,7 @@ E5_EMBEDDING_PROMPTS = {
         "Find questions that have the same meaning as the input question",
     ],
     "squad": "Retrieve Wikipedia passages that answer the question",
-    "t2ranking": "Given a Chinese search query, retrieve web passages that answer the question",
+    # "t2ranking": "Given a Chinese search query, retrieve web passages that answer the question",
     "trivia_qa": "Retrieve Wikipedia passages that answer the question",
 }
 
@@ -37,6 +37,7 @@ class E5Mix(Dataset):
         dataset_name: str = "E5Mix",
         split: str = "validation",
         file_path: str = "cache/echo-data",
+        aug_file_path: str = "cache/augmentation_data.jsonl",
         effective_batch_size: int = 32,
         shuffle_individual_datasets: bool = True,
         separator: str = "!@#$%^&*()",
@@ -46,6 +47,8 @@ class E5Mix(Dataset):
         self.effective_batch_size = effective_batch_size
         self.shuffle_individual_datasets = shuffle_individual_datasets
         self.separator = separator
+        # NEW
+        self.aug_file_path = aug_file_path
 
         self.data = []
         self.load_data(file_path)
@@ -137,13 +140,46 @@ class E5Mix(Dataset):
                     logger.info(f"Skip 1 batch for dataset {dataset}.")
         random.shuffle(all_batches)
 
-        final_idx_order = []
-        for batch in all_batches:
-            for idx in batch:
-                final_idx_order.append(idx)
 
-        self.data = [all_samples[idx] for idx in final_idx_order]
-        logger.info(f"Loaded {len(self.data)} samples.")
+        ## NEW
+        with open(self.aug_file_path, "r", encoding="utf-8") as f:
+            augment_samples = f.readlines()
+
+        augment_samples = [json.loads(d) for d in augment_samples]
+ 
+        # final_idx_order = []
+        self.data = []
+        self.counter_augment = 0
+        for batch in all_batches:
+
+            replace_index = random.randint(0, len(batch)-1)
+
+            for i, idx in enumerate(batch):
+                item = all_samples[idx]
+
+                if i==replace_index and len(augment_samples)>0:
+                    augment_sample = augment_samples.pop(0)
+
+                    instruction = augment_sample["task"]
+                    query = f"{instruction}; " + self.separator + augment_sample["user_query"]
+                    pos = self.separator + augment_sample["positive_document"]
+                    neg = self.separator + augment_sample["hard_negative_document"]
+                    
+                    item.query = query
+                    item.positive = pos
+                    item.negative = neg
+                    item.task_name = "augment"
+                    self.counter_augment += 1
+
+                self.data.append(item)
+
+        logger.info(f"Total {len(self.data)} samples.")
+        self.data = self.data[:30000]
+
+        # self.data = [all_samples[idx] for idx in final_idx_order]
+        logger.info(f"Loaded {len(self.data)} samples including {self.counter_augment} augmented samples.")
+
+        # import ipdb; ipdb.set_trace()
 
     def __getitem__(self, index):
         sample = self.data[index]

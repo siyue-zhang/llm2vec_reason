@@ -47,6 +47,10 @@ MODEL_CONFIG_CLASSES = list(MODEL_FOR_MASKED_LM_MAPPING.keys())
 MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
 
 
+import os
+os.environ["WANDB_PROJECT"] = "reasoning-intensive retrieval"
+
+
 def prepare_for_tokenization(model, text, pooling_mode="mean"):
     if model.config._name_or_path == "meta-llama/Meta-Llama-3-8B-Instruct":
         text = (

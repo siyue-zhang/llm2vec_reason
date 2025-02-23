@@ -25,5 +25,7 @@
     "gradient_checkpointing": true,
     "torch_dtype": "bfloat16",
     "attn_implementation": "flash_attention_2",
-    "seed": 42
+    "seed": 42,
+    "report_to": "wandb",
+    "run_name": "llm2vec_llama3_mntp_e5mix"
 }
