@@ -1,0 +1,22 @@
+srun --nodes=1 --tasks-per-node=1 --cpus-per-task=1 --mem=200GB --time=20:00:00 --gres=gpu:rtx8000:1 --pty /bin/bash
+srun --nodes=1 --tasks-per-node=1 --cpus-per-task=2 --mem=200GB --time=20:00:00 --gres=gpu:rtx8000:2 --pty /bin/bash
+srun --nodes=1 --tasks-per-node=4 --cpus-per-task=4 --mem=200GB --time=20:00:00 --gres=gpu:rtx8000:4 --pty /bin/bash
+
+srun --nodes=1 --tasks-per-node=1 --cpus-per-task=1 --mem=200GB --time=20:00:00 --gres=gpu:a100:1 --pty /bin/bash
+
+# # 12.1
+singularity exec --nv --overlay /scratch/sz4651/Projects/overlay-share.ext3:rw /scratch/work/public/singularity/cuda12.1.1-cudnn8.9.0-devel-ubuntu22.04.2.sif /bin/bash
+conda activate /scratch/sz4651/Projects/ext3/miniconda3/envs/metriever
+conda activate /scratch/sz4651/Projects/ext3/miniconda3/envs/rare
+
+cd /scratch/sz4651/Projects/RARe
+
+conda activate /scratch/sz4651/Projects/ext3/miniconda3/envs/cpp
+
+
+
+
+cd /scratch/sz4651/Projects/llm2vec_reason
+conda activate /scratch/sz4651/Projects/ext3/miniconda3/envs/llm2vec
+
+torchrun --nproc_per_node=8 experiments/run_supervised.py train_configs/supervised/MetaLlama3.json

@@ -3,7 +3,7 @@
     "peft_model_name_or_path": "McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp",
     "bidirectional": true,
     "pooling_mode": "mean",
-    "dataset_name": "E5",
+    "dataset_name": "E5Mix",
     "dataset_file_path": "cache/echo-data",
     "remove_unused_columns": false,
     "learning_rate": 2e-4,
