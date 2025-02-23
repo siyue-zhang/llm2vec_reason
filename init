@@ -20,4 +20,4 @@ conda activate /scratch/sz4651/Projects/ext3/miniconda3/envs/cpp
 cd /scratch/sz4651/Projects/llm2vec_reason
 conda activate /scratch/sz4651/Projects/ext3/miniconda3/envs/llm2vec
 
-torchrun --nproc_per_node=1 experiments/run_supervised.py train_configs/supervised/MetaLlama3.json
+torchrun --nproc_per_node=2 experiments/run_supervised.py train_configs/supervised/MetaLlama3.json
