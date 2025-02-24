@@ -21,3 +21,21 @@ cd /scratch/sz4651/Projects/llm2vec_reason
 conda activate /scratch/sz4651/Projects/ext3/miniconda3/envs/llm2vec
 
 torchrun --nproc_per_node=2 experiments/run_supervised.py train_configs/supervised/MetaLlama3.json
+
+default="/home/siyue/Projects/llm2vec_reason/output/mntp-supervised/Meta-Llama-3-8B-Instruct/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-64_l-512_bidirectional-True_e-3_s-42_w-300_lr-0.0002_lora_r-16/checkpoint-200",
+
+python experiments/mteb_eval_custom.py \
+--peft_model_name_or_path /home/siyue/Projects/llm2vec_reason/output/mntp-supervised/Meta-Llama-3-8B-Instruct-2/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-80_l-512_bidirectional-True_e-3_s-42_w-300_lr-0.0002_lora_r-16/checkpoint-1000 \
+--task_name BrightRetrieval \
+--output_dir 1k_results_2
+
+
+
+--peft_model_name_or_path McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp-supervised \
+
+
+# --peft_model_name_or_path /home/siyue/Projects/llm2vec_reason/output/mntp-supervised/Meta-Llama-3-8B-Instruct/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-64_l-512_bidirectional-True_e-3_s-42_w-300_lr-0.0002_lora_r-16/checkpoint-600 \
+
+# --task_name STS16
+# --task_to_instructions_fp test_configs/mteb/task_to_instructions.json \
+# --output_dir results

@@ -8,6 +8,7 @@ if __name__ == "__main__":
         "--model_name",
         type=str,
         default="McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp-supervised",
+        
     )
     parser.add_argument("--task_name", type=str, default="STS16")
     parser.add_argument(

@@ -152,29 +152,31 @@ class E5Mix(Dataset):
         self.counter_augment = 0
         for batch in all_batches:
 
-            replace_index = random.randint(0, len(batch)-1)
+            # replace_index = random.randint(0, len(batch)-1)
 
             for i, idx in enumerate(batch):
                 item = all_samples[idx]
 
-                if i==replace_index and len(augment_samples)>0:
-                    augment_sample = augment_samples.pop(0)
+                # if i==replace_index and len(augment_samples)>0:
+                # if i==replace_index:
+                #     # augment_sample = augment_samples.pop(0)
+                #     augment_sample = random.choice(augment_samples)
 
-                    instruction = augment_sample["task"]
-                    query = f"{instruction}; " + self.separator + augment_sample["user_query"]
-                    pos = self.separator + augment_sample["positive_document"]
-                    neg = self.separator + augment_sample["hard_negative_document"]
+                #     instruction = augment_sample["task"]
+                #     query = f"{instruction}; " + self.separator + augment_sample["user_query"]
+                #     pos = self.separator + augment_sample["positive_document"]
+                #     neg = self.separator + augment_sample["hard_negative_document"]
                     
-                    item.query = query
-                    item.positive = pos
-                    item.negative = neg
-                    item.task_name = "augment"
-                    self.counter_augment += 1
+                #     item.query = query
+                #     item.positive = pos
+                #     item.negative = neg
+                #     item.task_name = "augment"
+                #     self.counter_augment += 1
 
                 self.data.append(item)
 
         logger.info(f"Total {len(self.data)} samples.")
-        self.data = self.data[:30000]
+        self.data = self.data[:300000]
 
         # self.data = [all_samples[idx] for idx in final_idx_order]
         logger.info(f"Loaded {len(self.data)} samples including {self.counter_augment} augmented samples.")

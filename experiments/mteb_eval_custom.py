@@ -10,6 +10,9 @@ from mteb.models.text_formatting_utils import corpus_to_texts
 
 from llm2vec import LLM2Vec
 
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 def llm2vec_instruction(instruction):
     if len(instruction) > 0 and instruction[-1] != ":":
         instruction = instruction.strip(".") + ":"
