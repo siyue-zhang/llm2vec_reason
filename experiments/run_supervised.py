@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass, field
 import os
-os.environ["WANDB_PROJECT"] = "reasoning-intensive retrieval"
+os.environ["WANDB_PROJECT"] = "reasoning-intensive retrieval (simcse)"
 os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"
 import sys
 from typing import Any, Dict, List, Optional, Tuple, Union

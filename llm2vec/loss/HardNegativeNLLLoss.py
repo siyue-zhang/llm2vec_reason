@@ -35,12 +35,21 @@ class HardNegativeNLLLoss:
             full_d_reps_pos = d_reps_pos
             full_q_reps = q_reps
             full_d_reps_neg = d_reps_neg
-
+        
         d_reps = torch.cat([full_d_reps_pos, full_d_reps_neg], dim=0)
+        
         scores = self.similarity_fct(full_q_reps, d_reps) * self.scale
         labels = torch.tensor(
             range(len(scores)), dtype=torch.long, device=scores.device
         )
 
+        # print("q_reps ", q_reps.size())
+        # print("d_reps_pos ", d_reps_pos.size())
+        # print("d_reps_neg ", d_reps_neg.size())
+        # print('scores ', scores.size())
+        # print('full_q_reps ', full_q_reps.size())
+        # print('labels ', labels.size())
+        # print(labels)
+        # assert 1==2
         loss = self.cross_entropy_loss(scores, labels)
         return loss
