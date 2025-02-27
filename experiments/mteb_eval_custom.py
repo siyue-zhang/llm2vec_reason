@@ -1,15 +1,15 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
 
 import argparse
 from typing import Any
-import mteb
+from mteb import mteb
 import json
 import torch
 
 import numpy as np
-from mteb.models.instructions import task_to_instruction
-from mteb.models.text_formatting_utils import corpus_to_texts
+from mteb.mteb.models.instructions import task_to_instruction
+from mteb.mteb.models.text_formatting_utils import corpus_to_texts
 
 from llm2vec import LLM2Vec
 

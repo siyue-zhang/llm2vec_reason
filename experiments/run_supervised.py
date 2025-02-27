@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass, field
 import os
 os.environ["WANDB_PROJECT"] = "reasoning-intensive retrieval (simcse)"
-os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
 import sys
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -240,6 +240,9 @@ class CustomArguments:
         default=50.0, metadata={"help": "The loss scale for the loss function"}
     )
 
+    loss_margin: float = field(
+        default=1, metadata={"help": "The loss margin for the loss function"}
+    )
 
 @dataclass
 class DefaultCollator:
@@ -461,7 +464,10 @@ def main():
 
     tokenizer = model.tokenizer
 
-    train_loss = load_loss(custom_args.loss_class, scale=custom_args.loss_scale)
+    if custom_args.loss_class == "TripletLoss":
+        train_loss = load_loss(custom_args.loss_class, margin=custom_args.loss_margin)
+    else:
+        train_loss = load_loss(custom_args.loss_class, scale=custom_args.loss_scale)
 
     data_collator = DefaultCollator(model)
 

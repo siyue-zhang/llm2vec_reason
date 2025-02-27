@@ -43,6 +43,13 @@ class HardNegativeNLLLoss:
             range(len(scores)), dtype=torch.long, device=scores.device
         )
 
+        loss = self.cross_entropy_loss(scores, labels)
+        return loss
+
+
+
+
+
         # print("q_reps ", q_reps.size())
         # print("d_reps_pos ", d_reps_pos.size())
         # print("d_reps_neg ", d_reps_neg.size())
@@ -51,5 +58,3 @@ class HardNegativeNLLLoss:
         # print('labels ', labels.size())
         # print(labels)
         # assert 1==2
-        loss = self.cross_entropy_loss(scores, labels)
-        return loss
