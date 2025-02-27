@@ -9,27 +9,28 @@ from mteb.abstasks.MultilingualTask import MultilingualTask
 from mteb.abstasks.TaskMetadata import TaskMetadata
 
 DOMAINS_LONG = [
-    "biology",
-    "earth_science",
-    "economics",
-    "psychology",
-    "robotics",
-    "stackoverflow",
-    "sustainable_living",
-    "pony",
+    # "biology",
+    # "earth_science",
+    # "economics",
+    # "psychology",
+    # "robotics",
+    # "stackoverflow",
+    # "sustainable_living",
+    # "pony",
 ]
 
 DOMAINS = DOMAINS_LONG + [
-    "leetcode",
-    "aops",
+    # "leetcode",
+    # "aops",
     "theoremqa_theorems",
-    "theoremqa_questions",
+    # "theoremqa_questions",
 ]
 
 DOMAINS_langs = {split: ["eng-Latn"] for split in DOMAINS}
 
 
-EVAL_SPLITS = ["standard", "long"]
+# EVAL_SPLITS = ["standard", "long"]
+EVAL_SPLITS = ["standard"]
 
 
 class BrightRetrieval(MultilingualTask, AbsTaskRetrieval):
