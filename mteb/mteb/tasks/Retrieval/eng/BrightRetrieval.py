@@ -8,6 +8,9 @@ from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
 from mteb.abstasks.MultilingualTask import MultilingualTask
 from mteb.abstasks.TaskMetadata import TaskMetadata
 
+# import os
+# print(os.getcwd())
+# from experiments.mteb_eval_custom import DOMAINS_LONG, DOMAINS
 DOMAINS_LONG = [
     # "biology",
     # "earth_science",
@@ -20,9 +23,9 @@ DOMAINS_LONG = [
 ]
 
 DOMAINS = DOMAINS_LONG + [
-    # "leetcode",
+    "leetcode",
     # "aops",
-    "theoremqa_theorems",
+    # "theoremqa_theorems",
     # "theoremqa_questions",
 ]
 
@@ -91,6 +94,10 @@ class BrightRetrieval(MultilingualTask, AbsTaskRetrieval):
             domain_corpus = datasets.load_dataset(
                 path, "documents", split=domain, cache_dir=cache_dir, revision=revision
             )
+
+            # TEMP
+            # domain_corpus = domain_corpus.select(range(100))
+            
             examples = datasets.load_dataset(
                 path, "examples", split=domain, cache_dir=cache_dir, revision=revision
             )
@@ -102,6 +109,28 @@ class BrightRetrieval(MultilingualTask, AbsTaskRetrieval):
                     cache_dir=cache_dir,
                     revision=revision,
                 )
+
+            # TEMP
+            # import json
+            # def load_jsonl(filepath):
+            #     data = []
+            #     with open(filepath, 'r', encoding='utf-8') as file:
+            #         for line in file:
+            #             data.append(json.loads(line))
+            #     return data
+            # file = '/home/siyue/Projects/llm2vec_reason/problems_output.jsonl'
+            # file = load_jsonl(file)
+            # new_query = []
+            # for row in file:
+            #     q = row['response']['body']['choices'][0]['message']['content']
+            #     new_query.append(q)
+            # def modify_query(example):
+            #     # Suppose new_query is a list or array of new values for the 'query' column
+            #     example['query'] = new_query.pop(0)  # Modify the 'query' column
+            #     return example
+            # examples = examples.map(modify_query)
+            ##
+
             corpus[domain]["standard"] = {
                 e["id"]: {"text": e["content"]} for e in domain_corpus
             }

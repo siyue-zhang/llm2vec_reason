@@ -37,7 +37,7 @@ class E5Mix(Dataset):
         dataset_name: str = "E5Mix",
         split: str = "validation",
         file_path: str = "cache/echo-data",
-        aug_file_path: str = "cache/augmentation_data.jsonl",
+        aug_file_path: str = "/home/siyue/Projects/data-aug/output/augmentation_data.jsonl",
         effective_batch_size: int = 32,
         shuffle_individual_datasets: bool = True,
         separator: str = "!@#$%^&*()",
@@ -164,15 +164,20 @@ class E5Mix(Dataset):
                         positive=pos,
                         negative=neg,
                         task_name='augment',
+                        pos_instance=augment_sample['instance'],
+                        neg_instance=augment_sample['negative_instance']
                     ))
 
         self.data = []
         for dataset in self.all_samples:
             while len(self.all_samples[dataset])>=self.effective_batch_size:
-                popped_items = random.sample(self.all_samples[dataset], self.effective_batch_size)  # Randomly select k items
-                for item in popped_items:
-                    self.all_samples[dataset].remove(item)  # Remove selected items from the original list
-                self.data += popped_items
+                popped_items = []
+                for _ in range(self.effective_batch_size):
+                    random_index = random.randint(0, len(self.all_samples[dataset]) - 1)
+                    popped_items.append(self.all_samples[dataset].pop(random_index))
+                self.data.append(popped_items)
+        random.shuffle(self.data)
+        self.data = [item for sublist in self.data for item in sublist]
 
         logger.info(f"Loaded {len(self.data)} augmented samples.")
 

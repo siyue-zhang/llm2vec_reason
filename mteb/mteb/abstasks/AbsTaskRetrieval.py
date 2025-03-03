@@ -306,6 +306,16 @@ class AbsTaskRetrieval(AbsTask):
     ) -> ScoresDict:
         start_time = time()
         results = retriever(corpus, queries)
+        excluded_ids = kwargs.get("excluded_ids", None)
+        query_ids = list(results.keys())
+        # filter results
+        if excluded_ids:
+            for qid, ex_ids in zip(query_ids, excluded_ids):
+                for ex_id in ex_ids:
+                    if ex_id in results[qid]:
+                        del results[qid][ex_id]
+            assert 1==2
+
         end_time = time()
         logger.info(f"Time taken to retrieve: {end_time - start_time:.2f} seconds")
 
@@ -315,7 +325,9 @@ class AbsTaskRetrieval(AbsTask):
             output_folder = Path(kwargs.get("output_folder", "results"))
             if not os.path.isdir(output_folder):
                 os.makedirs(output_folder)
-
+        # NEW
+        from copy import deepcopy
+        results_doc = deepcopy(results)
         if save_predictions:
             top_k = kwargs.get("top_k", None)
             if top_k is not None:
@@ -328,12 +340,25 @@ class AbsTaskRetrieval(AbsTask):
                     results[qid] = {
                         k: v for k, v in results[qid].items() if k in doc_ids
                     }
+                    # NEW
+                    results_doc[qid] = {
+                        k: {"score": v, "content": corpus[k]} for k, v in results[qid].items() if k in doc_ids
+                    }
             qrels_save_path = (
                 output_folder / f"{self.metadata.name}_{hf_subset}_predictions.json"
+            )
+            # NEW
+            qrels_save_path_doc = (
+                output_folder / f"{self.metadata.name}_{hf_subset}_predictions_doc.json"
             )
 
             with open(qrels_save_path, "w") as f:
                 json.dump(results, f)
+            # NEW
+            for query in results_doc:
+                results_doc[query] = {'gold':relevant_docs[query], 'retrieved':results_doc[query]}
+            with open(qrels_save_path_doc, "w") as f:
+                json.dump(results_doc, f)
 
         ndcg, _map, recall, precision, naucs = retriever.evaluate(
             relevant_docs,

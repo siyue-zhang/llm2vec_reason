@@ -42,10 +42,6 @@ class LLM2VecWrapper:
             )
         else:
             instruction = ""
-        print('------')
-        print(instruction)
-        print(prompt_name)
-        assert 1==2
         sentences = [[instruction, sentence] for sentence in sentences]
         return self.model.encode(sentences, **kwargs)
 
@@ -93,14 +89,20 @@ if __name__ == "__main__":
         with open(args.task_to_instructions_fp, "r") as f:
             task_to_instructions = json.load(f)
     
-    if parser.task_name=="BrightRetrieval":
-        subset_instructions = {
-            'leetcode': "Given a coding problem, retrieve a solution that applies the relevant algorithm, even if the solution was originally for a different problem:",
-            'theoremqa_t': "Given a problem, retrieve the relevant math theorem that is helpful for solving the given problem:",
-            'aops': "Given a problem, retrieve a solution that applies the relevant math theorem, even if the solution was originally for a different problem:",
-            'economics': "Given a Economics post, retrieve relevant passages that help answer the post:",
-        }
-        task_to_instructions["BrightRetrieval"] = subset_instructions[parser.subset_name]
+    # if parser.task_name=="BrightRetrieval":
+    #     subset_instructions = {
+    #         'leetcode': "Given a coding problem, retrieve a solution that applies the relevant algorithm, even if the solution was originally for a different problem:",
+    #         'theoremqa_theorems': "Given a problem, retrieve the relevant math theorem that is helpful for solving the given problem:",
+    #         'aops': "Given a problem, retrieve a solution that applies the relevant math theorem, even if the solution was originally for a different problem:",
+    #         'economics': "Given a Economics post, retrieve relevant passages that help answer the post:",
+    #     }
+    #     task_to_instructions["BrightRetrieval"] = subset_instructions[parser.subset_name]
+    #     if parser.subset_name in ["leetcode","aops","theoremqa_theorems","theoremqa_questions"]:
+    #         DOMAINS_LONG = []
+    #         DOMAINS = [parser.subset_name]
+    #     else:
+    #         DOMAINS_LONG = [parser.subset_name]
+    #         DOMAINS = [parser.subset_name]
 
     l2v_model = LLM2Vec.from_pretrained(
         args.base_model_name_or_path,
@@ -112,4 +114,15 @@ if __name__ == "__main__":
     model = LLM2VecWrapper(model=l2v_model, task_to_instructions=task_to_instructions)
     tasks = mteb.get_tasks(tasks=[args.task_name])
     evaluation = mteb.MTEB(tasks=tasks)
-    results = evaluation.run(model, output_folder=args.output_dir)
+
+    from datasets import load_dataset
+    if args.task_name=='BrightRetrieval':
+        data_examples = load_dataset("xlangai/BRIGHT", "examples")[args.subset_name]
+        excluded_ids = data_examples["excluded_ids"].tolist()
+    else:
+        excluded_ids = []
+
+    results = evaluation.run(model, output_folder=args.output_dir, save_predictions=True, top_k=5, excluded_ids=excluded_ids)
+
+
+    # excluded_ids

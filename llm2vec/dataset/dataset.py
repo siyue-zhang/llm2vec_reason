@@ -11,7 +11,8 @@ class DataSample:
     positive: str
     negative: str = None
     task_name: str = None
-
+    pos_instance: str = None
+    neg_instance: str = None
 
 class TrainSample:
     """
