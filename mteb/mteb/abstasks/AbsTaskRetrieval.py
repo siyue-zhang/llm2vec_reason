@@ -307,10 +307,13 @@ class AbsTaskRetrieval(AbsTask):
         start_time = time()
         results = retriever(corpus, queries)
         excluded_ids = kwargs.get("excluded_ids", None)
+        print(excluded_ids)
         query_ids = list(results.keys())
         # filter results
         if excluded_ids:
             for qid, ex_ids in zip(query_ids, excluded_ids):
+                print(qid, 'qid')
+                assert 1==2
                 for ex_id in ex_ids:
                     if ex_id in results[qid]:
                         del results[qid][ex_id]
