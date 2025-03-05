@@ -23,8 +23,8 @@ DOMAINS_LONG = [
 ]
 
 DOMAINS = DOMAINS_LONG + [
-    "leetcode",
-    # "aops",
+    # "leetcode",
+    "aops",
     # "theoremqa_theorems",
     # "theoremqa_questions",
 ]
@@ -109,6 +109,9 @@ class BrightRetrieval(MultilingualTask, AbsTaskRetrieval):
                     cache_dir=cache_dir,
                     revision=revision,
                 )
+
+            # TEMP
+            # examples = examples.select(range(10))
 
             # TEMP
             # import json

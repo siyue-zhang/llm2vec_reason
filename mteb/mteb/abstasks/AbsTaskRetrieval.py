@@ -307,17 +307,16 @@ class AbsTaskRetrieval(AbsTask):
         start_time = time()
         results = retriever(corpus, queries)
         excluded_ids = kwargs.get("excluded_ids", None)
-        print(excluded_ids)
         query_ids = list(results.keys())
-        # filter results
+
+        # exclude ids results
         if excluded_ids:
             for qid, ex_ids in zip(query_ids, excluded_ids):
-                print(qid, 'qid')
-                assert 1==2
                 for ex_id in ex_ids:
                     if ex_id in results[qid]:
-                        del results[qid][ex_id]
-            assert 1==2
+                        print(f'set zero to exclude {ex_id}')
+                        results[qid][ex_id] = 0
+                results[qid] = dict(sorted(results[qid].items(), key=lambda item: item[1]))
 
         end_time = time()
         logger.info(f"Time taken to retrieve: {end_time - start_time:.2f} seconds")
@@ -331,6 +330,8 @@ class AbsTaskRetrieval(AbsTask):
         # NEW
         from copy import deepcopy
         results_doc = deepcopy(results)
+        ##
+
         if save_predictions:
             top_k = kwargs.get("top_k", None)
             if top_k is not None:
@@ -345,19 +346,23 @@ class AbsTaskRetrieval(AbsTask):
                     }
                     # NEW
                     results_doc[qid] = {
-                        k: {"score": v, "content": corpus[k]} for k, v in results[qid].items() if k in doc_ids
+                        k: {"score": v, "content": corpus[k]} 
+                        for k, v in sorted(results[qid].items(), key=lambda item: item[1], reverse=True)
+                        if k in doc_ids
                     }
+                    ##
+
             qrels_save_path = (
                 output_folder / f"{self.metadata.name}_{hf_subset}_predictions.json"
-            )
-            # NEW
-            qrels_save_path_doc = (
-                output_folder / f"{self.metadata.name}_{hf_subset}_predictions_doc.json"
             )
 
             with open(qrels_save_path, "w") as f:
                 json.dump(results, f)
+
             # NEW
+            qrels_save_path_doc = (
+                output_folder / f"{self.metadata.name}_{hf_subset}_predictions_doc.json"
+            )
             for query in results_doc:
                 results_doc[query] = {'gold':relevant_docs[query], 'retrieved':results_doc[query]}
             with open(qrels_save_path_doc, "w") as f:

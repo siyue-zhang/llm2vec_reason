@@ -1,5 +1,5 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2"
 
 import argparse
 from typing import Any
@@ -118,11 +118,12 @@ if __name__ == "__main__":
     from datasets import load_dataset
     if args.task_name=='BrightRetrieval':
         data_examples = load_dataset("xlangai/BRIGHT", "examples")[args.subset_name]
-        excluded_ids = data_examples["excluded_ids"].tolist()
+        excluded_ids = data_examples["excluded_ids"]
     else:
         excluded_ids = []
 
-    results = evaluation.run(model, output_folder=args.output_dir, save_predictions=True, top_k=5, excluded_ids=excluded_ids)
+    # topk will cut results, set topk>20
+    results = evaluation.run(model, output_folder=args.output_dir, save_predictions=True, top_k=100, excluded_ids=excluded_ids)
 
 
     # excluded_ids
