@@ -120,6 +120,12 @@ class E5Mix(Dataset):
             new_data_map[new_dataset] += data_map[dataset]
         data_map = new_data_map
 
+        # equalize size for each one
+        for dataset in data_map:
+            if len(data_map[dataset])>20000:
+                data_map[dataset] = random.sample(data_map[dataset],20000)
+            print(dataset, len(data_map[dataset]))
+
         if self.shuffle_individual_datasets:
             for task, samples in data_map.items():
                 random.shuffle(samples)
@@ -179,7 +185,7 @@ class E5Mix(Dataset):
         random.shuffle(self.data)
         # self.data = [item for sublist in self.data for item in sublist]
 
-
+        # self.data = random.sample(self.data, int(30000/self.effective_batch_size))
         logger.info(f"Loaded {len(self.data)*self.effective_batch_size} augmented samples.")
 
         e5 = random.sample(all_batches, int(30000/self.effective_batch_size))

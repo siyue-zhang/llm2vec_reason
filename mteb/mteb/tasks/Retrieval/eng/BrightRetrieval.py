@@ -121,7 +121,7 @@ class BrightRetrieval(MultilingualTask, AbsTaskRetrieval):
             #         for line in file:
             #             data.append(json.loads(line))
             #     return data
-            # file = '/home/siyue/Projects/llm2vec_reason/problems_output.jsonl'
+            # file = '/home/siyue/Projects/llm2vec_reason/aops_problems_output.jsonl'
             # file = load_jsonl(file)
             # new_query = []
             # for row in file:
@@ -132,7 +132,7 @@ class BrightRetrieval(MultilingualTask, AbsTaskRetrieval):
             #     example['query'] = new_query.pop(0)  # Modify the 'query' column
             #     return example
             # examples = examples.map(modify_query)
-            ##
+            #
 
             corpus[domain]["standard"] = {
                 e["id"]: {"text": e["content"]} for e in domain_corpus
