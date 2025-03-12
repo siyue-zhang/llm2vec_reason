@@ -83,6 +83,16 @@ if __name__ == "__main__":
     parser.add_argument("--output_dir", type=str, default="results")
 
     args = parser.parse_args()
+    if args.task_name != 'BrightRetrieval':
+        mapping = {
+            "BrightAops":"aops",
+            "BrightBiology":"biology",
+            "BrightEconomics":"economics",
+            "BrightLeetcode":"leetcode",
+            "BrightPony":"pony",
+            "BrightTheoremqaTheorems":"theoremqa_theorems",
+        }
+        args.subset_name = mapping[args.task_name]
 
     task_to_instructions = None
     if args.task_to_instructions_fp is not None:
@@ -116,7 +126,7 @@ if __name__ == "__main__":
     evaluation = mteb.MTEB(tasks=tasks)
 
     from datasets import load_dataset
-    if args.task_name=='BrightRetrieval':
+    if 'Bright' in args.task_name:
         data_examples = load_dataset("xlangai/BRIGHT", "examples")[args.subset_name]
         excluded_ids = data_examples["excluded_ids"]
     else:

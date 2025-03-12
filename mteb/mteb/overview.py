@@ -295,6 +295,7 @@ def get_task(
     Examples:
         >>> get_task("BornholmBitextMining")
     """
+
     if task_name not in TASKS_REGISTRY:
         close_matches = difflib.get_close_matches(task_name, TASKS_REGISTRY.keys())
         if close_matches:

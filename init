@@ -26,12 +26,14 @@ default="/home/siyue/Projects/llm2vec_reason/output/mntp-supervised/Meta-Llama-3
 
 python experiments/mteb_eval_custom.py \
 --peft_model_name_or_path /home/siyue/Projects/llm2vec_reason/output/mntp-supervised/Meta-Llama-3-8B-Instruct-mntp-simcse-e5-aug-v2/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-128_l-512_bidirectional-True_e-3_s-42_w-300_lr-0.0002_lora_r-16/checkpoint-900 \
---task_name BrightRetrieval \
---subset_name leetcode \
+--task_name BrightBiology \
 --output_dir simcse_e5-aug-v2_results
 
 
 --subset_name theoremqa_theorems
+
+--subset_name leetcode \
+
 
 McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp-unsup-simcse
 
