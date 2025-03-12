@@ -23,8 +23,8 @@ DOMAINS_LONG = [
 ]
 
 DOMAINS = DOMAINS_LONG + [
-    # "leetcode",
-    "aops",
+    "leetcode",
+    # "aops",
     # "theoremqa_theorems",
     # "theoremqa_questions",
 ]
