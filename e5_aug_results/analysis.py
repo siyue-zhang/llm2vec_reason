@@ -10,9 +10,18 @@ def load_json(file_path):
 file_path = "/home/siyue/Projects/llm2vec_reason/e5_aug_results/aops/BrightRetrieval_aops_predictions_doc.json"
 json_data = load_json(file_path)
 
+# from datasets import load_dataset
+# data_examples = load_dataset("xlangai/BRIGHT", "examples")
+# data_examples = data_examples['aops']
+
+
 from datasets import load_dataset
-data_examples = load_dataset("xlangai/BRIGHT", "examples")
-data_examples = data_examples['aops']
+corpus = load_dataset("xlangai/BRIGHT", "documents")
+corpus = corpus['theoremqa_theorems']
+corpus = {e['id']:e['content'] for e in corpus}
+print(corpus['20777'])
+assert 1==2
+
 query_map = {}
 for ex in data_examples:
     qid = ex['id']

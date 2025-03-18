@@ -41,7 +41,7 @@ class BrightTheoremqaTheorems(MultilingualTask, AbsTaskRetrieval):
         name="BrightTheoremqaTheorems",
         dataset={
             "path": "xlangai/BRIGHT",
-            "revision": "a75a0eb",
+            "revision": "3066d29",
         },
         reference="https://huggingface.co/datasets/xlangai/BRIGHT",
         description=("Bright retrieval dataset."),
@@ -114,24 +114,31 @@ class BrightTheoremqaTheorems(MultilingualTask, AbsTaskRetrieval):
             # examples = examples.select(range(10))
 
             # TEMP
-            # import json
-            # def load_jsonl(filepath):
-            #     data = []
-            #     with open(filepath, 'r', encoding='utf-8') as file:
-            #         for line in file:
-            #             data.append(json.loads(line))
-            #     return data
-            # file = '/home/siyue/Projects/llm2vec_reason/aops_problems_output.jsonl'
-            # file = load_jsonl(file)
-            # new_query = []
-            # for row in file:
-            #     q = row['response']['body']['choices'][0]['message']['content']
-            #     new_query.append(q)
-            # def modify_query(example):
-            #     # Suppose new_query is a list or array of new values for the 'query' column
-            #     example['query'] = new_query.pop(0)  # Modify the 'query' column
-            #     return example
-            # examples = examples.map(modify_query)
+            import json
+            def load_jsonl(filepath):
+                data = []
+                with open(filepath, 'r', encoding='utf-8') as file:
+                    for line in file:
+                        data.append(json.loads(line))
+                return data
+            file = '/home/siyue/Projects/llm2vec_reason/preproc/theoremqa_theorems_problems_output.jsonl'
+            file = load_jsonl(file)
+            new_query = []
+            for row in file:
+                q = row['response']['body']['choices'][0]['message']['content']
+                sep = "**Theorem**"
+                if sep in q:
+                    q = q.split(sep)[-1].strip()
+                else:
+                    print(q)
+                    raise NameError
+                new_query.append(q)
+
+            def modify_query(example):
+                # Suppose new_query is a list or array of new values for the 'query' column
+                example['query'] = new_query.pop(0)  # Modify the 'query' column
+                return example
+            examples = examples.map(modify_query)
             #
 
             corpus[domain]["standard"] = {

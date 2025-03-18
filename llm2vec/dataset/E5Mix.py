@@ -1,6 +1,7 @@
 import json
 import random
 import os
+from collections import defaultdict
 
 from .dataset import DataSample, TrainSample, Dataset
 from accelerate.logging import get_logger
@@ -37,7 +38,7 @@ class E5Mix(Dataset):
         dataset_name: str = "E5Mix",
         split: str = "validation",
         file_path: str = "cache/echo-data",
-        aug_file_path: str = "/home/siyue/Projects/data-aug/output/augmentation_data.jsonl",
+        aug_file_path: str = "/home/siyue/Projects/data-aug/output/augmentation_data_i2s.jsonl",
         effective_batch_size: int = 32,
         shuffle_individual_datasets: bool = True,
         separator: str = "!@#$%^&*()",
@@ -156,7 +157,6 @@ class E5Mix(Dataset):
         ##
         # datasets = list(set([s['task'] for s in augment_samples]))
 
-        from collections import defaultdict
         self.all_samples = defaultdict(lambda: [])
 
         for id_, augment_sample in enumerate(augment_samples):
@@ -194,7 +194,7 @@ class E5Mix(Dataset):
             tmp.append([all_samples[idx] for idx in batch])
         e5 = tmp
 
-        self.data += e5
+        # self.data += e5
         random.shuffle(self.data)
         self.data = [item for sublist in self.data for item in sublist]
 

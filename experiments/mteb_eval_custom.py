@@ -133,7 +133,7 @@ if __name__ == "__main__":
         excluded_ids = []
 
     # topk will cut results, set topk>20
-    results = evaluation.run(model, output_folder=args.output_dir, save_predictions=True, top_k=100, excluded_ids=excluded_ids)
+    results = evaluation.run(model, output_folder=args.output_dir, save_predictions=True, top_k=200, excluded_ids=excluded_ids)
 
 
     # excluded_ids
