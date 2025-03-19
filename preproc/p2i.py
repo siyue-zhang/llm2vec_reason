@@ -147,7 +147,7 @@ Following the above format, write the solution after **Solution** and theorem na
 {q}
 """
 
-    ls = {'aops':4000, 'theoremqa_theorems':2000}
+    ls = {'aops':5000, 'theoremqa_theorems':5000}
 
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},

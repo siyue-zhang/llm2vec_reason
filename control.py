@@ -16,12 +16,14 @@ l2v = LLM2Vec.from_pretrained(
 instruction = (
     # "Given a math equation, retrieve equivalent or similar equations:"
     # "Given a math formula name, retrieve relevant equations:"
-    "Given a question, retrieve the right answer:"
+    # "Given a question, retrieve the right answer:"
+    'Given a problem, retrieve the solutions to other problems that base on the similar concepts as the solution to the given question:'
 )
 
 
 queries = [
-    [instruction, "2^2 + 4^2 = ?"],
+    [instruction, 'Let $r$, $s$, and $t$ be the three roots of the equation $8x^3 + 1001x + 2008 = 0.$ Find $(r + s)^3 + (s + t)^3 + (t + r)^3$.']
+    # [instruction, "2^2 + 4^2 = ?"],
     # [instruction, "$a^2 + b^2 = c^2$"],
     # [instruction, "Fundamental Theorem of Calculus"],
     # [instruction, "A ladder is leaning against a wall. The base of the ladder is 6 feet away from the wall, and the top of the ladder reaches a height of 8 feet from the ground. How long is the ladder?"],
@@ -84,6 +86,19 @@ documents = [
 #     "F'(x) = 3x^2 + 5x + 2 \\quad \\text{with\} \\quad F(x) = \\prod_{k=1}^{x} (3k^2 + 5k + 2)",
 #     "\int_{-3}^1 (7x^2 + x +1)dx",
 #     "What is \int_{-3}^1 (7x^2 + x +1)dx? To solve this integral, we first need to find the antiderivative of the given function, which is: F(x) = \int (7x^2 + x + 1)dx = (7/3)x^3 + (1/2)x^2 + x + C Now, we need to evaluate the definite integral from -3 to 1: \int_{-3}^1 (7x^2 + x + 1)dx = F(1) - F(-3) F(1) = (7/3)(1)^3 + (1/2)(1)^2 + (1) = 7/3 + 1/2 + 1 F(-3) = (7/3)(-3)^3 + (1/2)(-3)^2 + (-3) = -63 + 9/2 - 3 Now, subtract F(-3) from F(1): (7/3 + 1/2 + 1) - (-63 + 9/2 - 3) = (7/3 + 1/2 + 1) + (63 - 9/2 + 3) To add the fractions, we need a common denominator, which is 6: (14/6 + 3/6 + 6/6) + (378/6 - 27/6 + 18/6) = (23/6) + (369/6) = 392/6 Therefore, the answer is 392/6."
+]
+
+
+documents = [
+"""The cubic f(x) = x3 - 7x - 6 has three distinct roots, a, b, and c. Compute 1/a + 1/b + 1/c .
+Answer Choices: (A) -5/6 (B) -6/6 (C) -7/6 (D) -8/6 (E) -9/6
+Let's reason about the multi-choice question.
+1/a+1/b+1/c=ab+bc+ca/abc
+=-7/-6
+=-7/6
+The answer is C
+""",
+r"""Let $s_k$ denote the sum of the $\textit{k}$th powers of the roots of the polynomial $x^3-5x^2+8x-13$. In particular, $s_0=3$, $s_1=5$, and $s_2=9$. Let $a$, $b$, and $c$ be real numbers such that $s_{k+1} = a \, s_k + b \, s_{k-1} + c \, s_{k-2}$ for $k = 2$, $3$, $....$ What is $a+b+c$? $\textbf{(A)} \; -6 \qquad \textbf{(B)} \; 0 \qquad \textbf{(C)} \; 6 \qquad \textbf{(D)} \; 10 \qquad \textbf{(E)} \; 26$ Applying Newton's Sums, we have $s_{k+1}+(-5)s_k+(8)s_{k-1}+(-13)s_{k-2}=0,$ so $s_{k+1}=5s_k-8s_{k-1}+13s_{k-2},$ we get the answer as $5+(-8)+13=10$.""",
 ]
 d_reps = l2v.encode(documents)
 
