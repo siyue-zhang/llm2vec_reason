@@ -81,6 +81,7 @@ if __name__ == "__main__":
         default="test_configs/mteb/task_to_instructions.json",
     )
     parser.add_argument("--output_dir", type=str, default="results")
+    parser.add_argument("--batch_size", type=int, default=32)
 
     args = parser.parse_args()
     if args.task_name != 'BrightRetrieval':
@@ -133,7 +134,7 @@ if __name__ == "__main__":
         excluded_ids = []
 
     # topk will cut results, set topk>20
-    results = evaluation.run(model, output_folder=args.output_dir, save_predictions=True, top_k=200, excluded_ids=excluded_ids)
+    results = evaluation.run(model, output_folder=args.output_dir, save_predictions=True, top_k=200, excluded_ids=excluded_ids, batch_size=args.batch_size)
 
 
     # excluded_ids

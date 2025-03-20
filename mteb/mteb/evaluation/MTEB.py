@@ -299,6 +299,7 @@ class MTEB:
         Returns:
             A list of MTEBResults objects, one for each task evaluated.
         """
+
         if "batch_size" in kwargs:
             logger.warning(
                 "The `batch_size` argument is deprecated and will be removed in the next release. "

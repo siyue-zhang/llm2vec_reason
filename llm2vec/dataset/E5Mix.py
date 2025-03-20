@@ -125,7 +125,7 @@ class E5Mix(Dataset):
         for dataset in data_map:
             if len(data_map[dataset])>20000:
                 data_map[dataset] = random.sample(data_map[dataset],20000)
-            print(dataset, len(data_map[dataset]))
+            # print(dataset, len(data_map[dataset]))
 
         if self.shuffle_individual_datasets:
             for task, samples in data_map.items():
@@ -173,22 +173,25 @@ class E5Mix(Dataset):
                         pos_instance=augment_sample['instance'],
                         neg_instance=augment_sample['negative_instance']
                     ))
-
+         
         self.data = []
         for dataset in self.all_samples:
+            print(len(self.all_samples[dataset]), self.effective_batch_size)
             while len(self.all_samples[dataset])>=self.effective_batch_size:
                 popped_items = []
                 for _ in range(self.effective_batch_size):
                     random_index = random.randint(0, len(self.all_samples[dataset]) - 1)
                     popped_items.append(self.all_samples[dataset].pop(random_index))
                 self.data.append(popped_items)
+            print(dataset, ' : ', len(popped_items), ' samples.')
+
         random.shuffle(self.data)
         # self.data = [item for sublist in self.data for item in sublist]
 
         # self.data = random.sample(self.data, int(30000/self.effective_batch_size))
         logger.info(f"Loaded {len(self.data)*self.effective_batch_size} augmented samples.")
 
-        e5 = random.sample(all_batches, int(30000/self.effective_batch_size))
+        e5 = random.sample(all_batches, int(40000/self.effective_batch_size))
         tmp = []
         for batch in e5:
             tmp.append([all_samples[idx] for idx in batch])

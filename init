@@ -25,14 +25,20 @@ torchrun --nproc_per_node=4 experiments/run_supervised.py train_configs/supervis
 default="/home/siyue/Projects/llm2vec_reason/output/mntp-supervised/Meta-Llama-3-8B-Instruct/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-64_l-512_bidirectional-True_e-3_s-42_w-300_lr-0.0002_lora_r-16/checkpoint-200",
 
 python experiments/mteb_eval_custom.py \
---peft_model_name_or_path /home/siyue/Projects/llm2vec_reason/output/mntp-supervised/Meta-Llama-3-8B-Instruct-mntp-simcse-aug-e5-v3.5/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-64_l-1024_bidirectional-True_e-3_s-42_w-300_lr-0.0002_lora_r-16/checkpoint-1000 \
+--peft_model_name_or_path /home/siyue/Projects/llm2vec_reason/output/mntp-supervised/Meta-Llama-3-8B-Instruct-mntp-simcse-aug-e5-v3.7/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-40_l-2048_bidirectional-True_e-3_s-42_w-600_lr-0.0002_lora_r-16/checkpoint-3000 \
+--task_name BrightTheoremqaTheorems \
+--output_dir simcse_aug_e5_v3.7_theoremqa_theorems \
+--batch_size 24
+
+python experiments/mteb_eval_custom.py \
+--peft_model_name_or_path /home/siyue/Projects/llm2vec_reason/output/mntp-supervised/Meta-Llama-3-8B-Instruct-mntp-simcse-aug-e5-v3.7/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-40_l-2048_bidirectional-True_e-3_s-42_w-600_lr-0.0002_lora_r-16/checkpoint-3000 \
 --task_name BrightAops \
---output_dir simcse_e5_aug_v3.5_aops
+--output_dir simcse_aug_e5_v3.7_aops
 
 python experiments/mteb_eval_custom.py \
 --peft_model_name_or_path /home/siyue/Projects/llm2vec_reason/output/mntp-supervised/Meta-Llama-3-8B-Instruct-mntp-simcse-aug-e5-v3.5/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-64_l-1024_bidirectional-True_e-3_s-42_w-300_lr-0.0002_lora_r-16/checkpoint-1000 \
 --task_name BrightLeetcode \
---output_dir simcse_e5_aug_v3.5_leetcode
+--output_dir simcse_aug_e5_v3.5_leetcode
 
 python experiments/mteb_eval_custom.py \
 --peft_model_name_or_path /home/siyue/Projects/llm2vec_reason/output/mntp-supervised/Meta-Llama-3-8B-Instruct-mntp-simcse-i2s/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-40_l-2048_bidirectional-True_e-3_s-42_w-300_lr-0.0002_lora_r-16/checkpoint-1000 \

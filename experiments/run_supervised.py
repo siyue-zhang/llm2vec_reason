@@ -158,6 +158,12 @@ class ModelArguments:
             )
         },
     )
+    doc_max_length: Optional[int] = field(
+        default=1024,
+    )
+    skip_instruction: Optional[bool] = field(
+        default=False,
+    )
     torch_dtype: Optional[str] = field(
         default=None,
         metadata={
@@ -452,6 +458,8 @@ def main():
         max_length=model_args.max_seq_length,
         torch_dtype=torch_dtype,
         attn_implementation=model_args.attn_implementation,
+        skip_instruction=model_args.skip_instruction,
+        doc_max_length=model_args.doc_max_length,
     )
 
     # model organization is LLM2VecModel.model -> HF Model, we have to apply PEFT to the inner model
