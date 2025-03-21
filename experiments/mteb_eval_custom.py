@@ -82,6 +82,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--output_dir", type=str, default="results")
     parser.add_argument("--batch_size", type=int, default=32)
+    parser.add_argument("--preproc", action='store_true', help='A boolean flag (True if present, False if absent)')
 
     args = parser.parse_args()
     if args.task_name != 'BrightRetrieval':
@@ -134,7 +135,7 @@ if __name__ == "__main__":
         excluded_ids = []
 
     # topk will cut results, set topk>20
-    results = evaluation.run(model, output_folder=args.output_dir, save_predictions=True, top_k=200, excluded_ids=excluded_ids, batch_size=args.batch_size)
+    results = evaluation.run(model, output_folder=args.output_dir, save_predictions=True, top_k=200, excluded_ids=excluded_ids, batch_size=args.batch_size, preproc=args.preproc)
 
 
     # excluded_ids

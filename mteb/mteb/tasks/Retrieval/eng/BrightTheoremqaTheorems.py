@@ -84,6 +84,7 @@ class BrightTheoremqaTheorems(MultilingualTask, AbsTaskRetrieval):
         eval_splits: list,
         cache_dir: str = None,
         revision: str = None,
+        preproc: bool = False,
     ):
         corpus = {domain: {split: None for split in eval_splits} for domain in DOMAINS}
         queries = {domain: {split: None for split in eval_splits} for domain in DOMAINS}
@@ -115,42 +116,43 @@ class BrightTheoremqaTheorems(MultilingualTask, AbsTaskRetrieval):
             # examples = examples.select(range(10))
 
             # TEMP
-            # import json
-            # def load_jsonl(filepath):
-            #     data = []
-            #     with open(filepath, 'r', encoding='utf-8') as file:
-            #         for line in file:
-            #             data.append(json.loads(line))
-            #     return data
-            # file = '/home/siyue/Projects/llm2vec_reason/preproc/theoremqa_theorems_problems_output.jsonl'
-            # file = load_jsonl(file)
-            # new_query = []
-            # for row in file:
-            #     q = row['response']['body']['choices'][0]['message']['content']
-            #     if '**Final Answer**' in q:
-            #         q = q.split('**Final Answer**')[0]
-            #     indicators = ["**Theorem**","**theorem**"," Theorems\n",]
-            #     for sep in indicators:
-            #         if sep in q:
-            #             q = q.split(sep)[-1]
-            #             q = q.split('\n')
-            #             q = [s for s in q if len(s.strip())>0]
-            #             q = [s for s in q if re.search(r'boxed', s)==None and re.match(r'^[\\\[\]\{\}\d]+$', s)==None and 'answer' not in s.lower()]
-            #             q = q[0]
-            #             break
-            #     else:
-            #         q = 'NO THEOREM FOUND'
-            #         print('ALARM: No theorem found!')
-            #     new_query.append(q)
-            # print(new_query)
-            # assert len(new_query)==len(examples)
+            if preproc:
+                import json
+                def load_jsonl(filepath):
+                    data = []
+                    with open(filepath, 'r', encoding='utf-8') as file:
+                        for line in file:
+                            data.append(json.loads(line))
+                    return data
+                file = '/home/siyue/Projects/llm2vec_reason/preproc/theoremqa_theorems_problems_output.jsonl'
+                file = load_jsonl(file)
+                new_query = []
+                for row in file:
+                    q = row['response']['body']['choices'][0]['message']['content']
+                    if '**Final Answer**' in q:
+                        q = q.split('**Final Answer**')[0]
+                    indicators = ["**Theorem**","**theorem**"," Theorems\n",]
+                    for sep in indicators:
+                        if sep in q:
+                            q = q.split(sep)[-1]
+                            q = q.split('\n')
+                            q = [s for s in q if len(s.strip())>0]
+                            q = [s for s in q if re.search(r'boxed', s)==None and re.match(r'^[\\\[\]\{\}\d]+$', s)==None and 'answer' not in s.lower()]
+                            q = q[0]
+                            break
+                    else:
+                        q = 'NO THEOREM FOUND'
+                        print('ALARM: No theorem found!')
+                    new_query.append(q)
+                print(new_query)
+                assert len(new_query)==len(examples)
 
-            # def modify_query(example):
-            #     # Suppose new_query is a list or array of new values for the 'query' column
-            #     example['query'] = new_query.pop(0)  # Modify the 'query' column
-            #     return example
-            # examples = examples.map(modify_query)
-            #
+                def modify_query(example):
+                    # Suppose new_query is a list or array of new values for the 'query' column
+                    example['query'] = new_query.pop(0)  # Modify the 'query' column
+                    return example
+                examples = examples.map(modify_query)
+                
 
             corpus[domain]["standard"] = {
                 e["id"]: {"text": e["content"]} for e in domain_corpus
@@ -182,8 +184,14 @@ class BrightTheoremqaTheorems(MultilingualTask, AbsTaskRetrieval):
         return corpus, queries, relevant_docs
 
     def load_data(self, **kwargs):
+
         if self.data_loaded:
             return
+        
+        if 'preproc' in kwargs:
+            preproc = kwargs['preproc']
+        else:
+            preproc = False
 
         self.corpus, self.queries, self.relevant_docs = self.load_bright_data(
             path=self.metadata_dict["dataset"]["path"],
@@ -191,5 +199,6 @@ class BrightTheoremqaTheorems(MultilingualTask, AbsTaskRetrieval):
             eval_splits=self.metadata_dict["eval_splits"],
             cache_dir=kwargs.get("cache_dir", None),
             revision=self.metadata_dict["dataset"]["revision"],
+            preproc=preproc,
         )
         self.data_loaded = True
