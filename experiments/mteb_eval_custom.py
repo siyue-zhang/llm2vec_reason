@@ -87,12 +87,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.task_name != 'BrightRetrieval':
         mapping = {
-            "BrightAops":"aops",
             "BrightBiology":"biology",
             "BrightEconomics":"economics",
+            "BrightStackOverflow":"stackoverflow",
             "BrightLeetcode":"leetcode",
             "BrightPony":"pony",
+            "BrightAops":"aops",
             "BrightTheoremqaTheorems":"theoremqa_theorems",
+            "BrightTheoremqaQuestions":"theoremqa_questions",
         }
         args.subset_name = mapping[args.task_name]
 

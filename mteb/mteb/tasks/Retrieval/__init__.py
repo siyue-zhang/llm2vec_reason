@@ -6,7 +6,8 @@ from .eng.BrightEconomics import *
 from .eng.BrightLeetcode import *
 from .eng.BrightPony import *
 from .eng.BrightTheoremqaTheorems import *
-from .eng.BrightStackflow import *
+from .eng.BrightStackOverflow import *
+from .eng.BrightTheoremqaQuestions import *
 
 from .ara.SadeemQuestionRetrieval import *
 from .code.AppsRetrieval import *

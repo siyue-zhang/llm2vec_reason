@@ -42,6 +42,9 @@ class E5Mix(Dataset):
         effective_batch_size: int = 32,
         shuffle_individual_datasets: bool = True,
         separator: str = "!@#$%^&*()",
+        domain: str = 'all',
+        task: str = 'all',
+        add_e5: bool = False
     ):
         self.dataset_name = dataset_name
         self.split = split
@@ -50,6 +53,9 @@ class E5Mix(Dataset):
         self.separator = separator
         # NEW
         self.aug_file_path = aug_file_path
+        self.domain = domain
+        self.task = task
+        self.add_e5 = add_e5
 
         self.data = []
         self.load_data(file_path)
@@ -64,88 +70,89 @@ class E5Mix(Dataset):
         data_map = {}
         all_samples = []
         id_ = 0
-        for dataset in E5_EMBEDDING_PROMPTS:
-            logger.info(f"Loading dataset {dataset}...")
-            if dataset not in data_map:
-                data_map[dataset] = []
-            with open(os.path.join(file_path, f"{dataset}.jsonl"), "r") as f:
-                dataset_samples = f.readlines()
+        if self.add_e5:
+            for dataset in E5_EMBEDDING_PROMPTS:
+                logger.info(f"Loading dataset {dataset}...")
+                if dataset not in data_map:
+                    data_map[dataset] = []
+                with open(os.path.join(file_path, f"{dataset}.jsonl"), "r") as f:
+                    dataset_samples = f.readlines()
 
-            dataset_samples = [json.loads(d) for d in dataset_samples]
+                dataset_samples = [json.loads(d) for d in dataset_samples]
 
-            for i, sample in enumerate(dataset_samples):
-                instruction = (
-                    E5_EMBEDDING_PROMPTS[dataset]
-                    if isinstance(E5_EMBEDDING_PROMPTS[dataset], str)
-                    else E5_EMBEDDING_PROMPTS[dataset][i % 2]
-                )
-                query = f"{instruction}; " + self.separator + sample["query"]
-                if dataset in [
-                    "allnli_split2",
-                    "quora_duplicates_split1",
-                    "quora_duplicates_split2",
-                ]:
-                    pos = (
-                        f"{E5_EMBEDDING_PROMPTS[dataset]}; "
-                        + self.separator
-                        + sample["positive"]
+                for i, sample in enumerate(dataset_samples):
+                    instruction = (
+                        E5_EMBEDDING_PROMPTS[dataset]
+                        if isinstance(E5_EMBEDDING_PROMPTS[dataset], str)
+                        else E5_EMBEDDING_PROMPTS[dataset][i % 2]
                     )
-                    neg = (
-                        f"{E5_EMBEDDING_PROMPTS[dataset]}; "
-                        + self.separator
-                        + sample["negative"]
+                    query = f"{instruction}; " + self.separator + sample["query"]
+                    if dataset in [
+                        "allnli_split2",
+                        "quora_duplicates_split1",
+                        "quora_duplicates_split2",
+                    ]:
+                        pos = (
+                            f"{E5_EMBEDDING_PROMPTS[dataset]}; "
+                            + self.separator
+                            + sample["positive"]
+                        )
+                        neg = (
+                            f"{E5_EMBEDDING_PROMPTS[dataset]}; "
+                            + self.separator
+                            + sample["negative"]
+                        )
+                    else:
+                        pos = self.separator + sample["positive"]
+                        neg = self.separator + sample["negative"]
+
+                    data_map[dataset].append(id_)
+
+                    all_samples.append(
+                        DataSample(
+                            id_=id_,
+                            query=query,
+                            positive=pos,
+                            negative=neg,
+                            task_name=dataset,
+                        )
                     )
-                else:
-                    pos = self.separator + sample["positive"]
-                    neg = self.separator + sample["negative"]
+                    id_ += 1
 
-                data_map[dataset].append(id_)
+            # combine split1 and split2
+            new_data_map = {}
+            for dataset in data_map:
+                new_dataset = dataset.replace("_split1", "").replace("_split2", "")
+                if new_dataset not in new_data_map:
+                    new_data_map[new_dataset] = []
+                new_data_map[new_dataset] += data_map[dataset]
+            data_map = new_data_map
 
-                all_samples.append(
-                    DataSample(
-                        id_=id_,
-                        query=query,
-                        positive=pos,
-                        negative=neg,
-                        task_name=dataset,
-                    )
-                )
-                id_ += 1
+            # equalize size for each one
+            for dataset in data_map:
+                if len(data_map[dataset])>20000:
+                    data_map[dataset] = random.sample(data_map[dataset],20000)
+                # print(dataset, len(data_map[dataset]))
 
-        # combine split1 and split2
-        new_data_map = {}
-        for dataset in data_map:
-            new_dataset = dataset.replace("_split1", "").replace("_split2", "")
-            if new_dataset not in new_data_map:
-                new_data_map[new_dataset] = []
-            new_data_map[new_dataset] += data_map[dataset]
-        data_map = new_data_map
+            if self.shuffle_individual_datasets:
+                for task, samples in data_map.items():
+                    random.shuffle(samples)
 
-        # equalize size for each one
-        for dataset in data_map:
-            if len(data_map[dataset])>20000:
-                data_map[dataset] = random.sample(data_map[dataset],20000)
-            # print(dataset, len(data_map[dataset]))
+            datasets = list(data_map.keys())
 
-        if self.shuffle_individual_datasets:
-            for task, samples in data_map.items():
-                random.shuffle(samples)
-
-        datasets = list(data_map.keys())
-
-        logger.info(
-            f"Batching Echo data properly for effective batch size of {self.effective_batch_size}..."
-        )
-        all_batches = []
-        for dataset in datasets:
-            dataset_samples = data_map[dataset]
-            for i in range(0, len(dataset_samples), self.effective_batch_size):
-                batch = dataset_samples[i : i + self.effective_batch_size]
-                if len(batch) == self.effective_batch_size:
-                    all_batches.append(batch)
-                else:
-                    logger.info(f"Skip 1 batch for dataset {dataset}.")
-        random.shuffle(all_batches)
+            logger.info(
+                f"Batching Echo data properly for effective batch size of {self.effective_batch_size}..."
+            )
+            all_batches = []
+            for dataset in datasets:
+                dataset_samples = data_map[dataset]
+                for i in range(0, len(dataset_samples), self.effective_batch_size):
+                    batch = dataset_samples[i : i + self.effective_batch_size]
+                    if len(batch) == self.effective_batch_size:
+                        all_batches.append(batch)
+                    else:
+                        logger.info(f"Skip 1 batch for dataset {dataset}.")
+            random.shuffle(all_batches)
 
 
         ## NEW
@@ -157,9 +164,32 @@ class E5Mix(Dataset):
         ##
         # datasets = list(set([s['task'] for s in augment_samples]))
 
+        domain_map = {
+            'aops': ['math'],
+            'leetcode': ['coding'],
+            'theoremqa': ['math','physics','finance'],
+            'all':['math','physics','finance','coding','math']
+        }
+        domain_question_mapping = {
+            'algorithm': 'coding',
+            'data structure': 'coding',
+            'math theorem': 'math',
+            'physics theorem': 'physics',
+            'finance formula': 'finance',
+        }
+
         self.all_samples = defaultdict(lambda: [])
 
         for id_, augment_sample in enumerate(augment_samples):
+            # domain filter
+            sample_domain = augment_sample['domain']
+            sample_domain_type = domain_question_mapping[sample_domain]
+            if sample_domain_type not in domain_map[self.domain]:
+                continue
+            # task filter
+            if self.task != 'all' and augment_sample['task_type'] != self.task:
+                continue
+
             instruction = augment_sample["task"]
             query = f"{instruction}; " + self.separator + augment_sample["user_query"]
             pos = self.separator + augment_sample["positive_document"]
@@ -186,18 +216,19 @@ class E5Mix(Dataset):
             print(dataset, ' : ', len(popped_items), ' samples.')
 
         random.shuffle(self.data)
-        # self.data = [item for sublist in self.data for item in sublist]
 
-        # self.data = random.sample(self.data, int(30000/self.effective_batch_size))
+        # self.data = random.sample(self.data, int(10240/self.effective_batch_size))
+        
         logger.info(f"Loaded {len(self.data)*self.effective_batch_size} augmented samples.")
+        
+        if self.add_e5:
+            e5 = random.sample(all_batches, int(40000/self.effective_batch_size))
+            tmp = []
+            for batch in e5:
+                tmp.append([all_samples[idx] for idx in batch])
+            e5 = tmp
+            self.data += e5
 
-        e5 = random.sample(all_batches, int(40000/self.effective_batch_size))
-        tmp = []
-        for batch in e5:
-            tmp.append([all_samples[idx] for idx in batch])
-        e5 = tmp
-
-        self.data += e5
         random.shuffle(self.data)
         self.data = [item for sublist in self.data for item in sublist]
 

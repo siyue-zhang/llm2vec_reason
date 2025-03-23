@@ -213,7 +213,16 @@ class DataTrainingArguments:
             )
         },
     )
-
+    domain: Optional[str] = field(
+        default='all',
+    )
+    task: Optional[str] = field(
+        default='all',
+    )
+    add_e5: Optional[bool] = field(
+        default=False,
+        metadata={"help": "Whether to use e5 data during training."},
+    )
 
 @dataclass
 class CustomArguments:
@@ -393,6 +402,7 @@ def main():
         ]
     else:
         kwargs = []
+
     accelerator = Accelerator(kwargs_handlers=kwargs)
 
     set_seed(training_args.seed)
@@ -431,7 +441,10 @@ def main():
         data_args.dataset_name,
         split="train",
         file_path=data_args.dataset_file_path,
-        effective_batch_size=training_args.per_device_train_batch_size
+        effective_batch_size=training_args.per_device_train_batch_size,
+        domain=data_args.domain,
+        task=data_args.task,
+        add_e5=data_args.add_e5
         * accelerator.num_processes,
     )
 

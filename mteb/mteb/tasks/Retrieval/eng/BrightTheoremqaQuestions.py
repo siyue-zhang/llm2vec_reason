@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 import datasets
+import re
 
 from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
 from mteb.abstasks.MultilingualTask import MultilingualTask
@@ -17,7 +18,7 @@ DOMAINS_LONG = [
     # "economics",
     # "psychology",
     # "robotics",
-    "stackoverflow",
+    # "stackoverflow",
     # "sustainable_living",
     # "pony",
 ]
@@ -26,7 +27,7 @@ DOMAINS = DOMAINS_LONG + [
     # "leetcode",
     # "aops",
     # "theoremqa_theorems",
-    # "theoremqa_questions",
+    "theoremqa_questions",
 ]
 
 DOMAINS_langs = {split: ["eng-Latn"] for split in DOMAINS}
@@ -36,9 +37,9 @@ DOMAINS_langs = {split: ["eng-Latn"] for split in DOMAINS}
 EVAL_SPLITS = ["standard"]
 
 
-class BrightStackflow(MultilingualTask, AbsTaskRetrieval):
+class BrightTheoremqaQuestions(MultilingualTask, AbsTaskRetrieval):
     metadata = TaskMetadata(
-        name="BrightStackflow",
+        name="BrightTheoremqaQuestions",
         dataset={
             "path": "xlangai/BRIGHT",
             "revision": "3066d29",
@@ -67,6 +68,13 @@ class BrightStackflow(MultilingualTask, AbsTaskRetrieval):
             year={2024},
             }
         """,
+        descriptive_stats={
+            "n_samples": {"standard": 1334914, "long": 7048},
+            "avg_character_length": {
+                "standard": 800.3994729248476,
+                "long": 46527.35839954597,
+            },
+        },
     )
 
     def load_bright_data(
@@ -108,25 +116,43 @@ class BrightStackflow(MultilingualTask, AbsTaskRetrieval):
             # examples = examples.select(range(10))
 
             # TEMP
-            # import json
-            # def load_jsonl(filepath):
-            #     data = []
-            #     with open(filepath, 'r', encoding='utf-8') as file:
-            #         for line in file:
-            #             data.append(json.loads(line))
-            #     return data
-            # file = '/home/siyue/Projects/llm2vec_reason/aops_problems_output.jsonl'
-            # file = load_jsonl(file)
-            # new_query = []
-            # for row in file:
-            #     q = row['response']['body']['choices'][0]['message']['content']
-            #     new_query.append(q)
-            # def modify_query(example):
-            #     # Suppose new_query is a list or array of new values for the 'query' column
-            #     example['query'] = new_query.pop(0)  # Modify the 'query' column
-            #     return example
-            # examples = examples.map(modify_query)
-            #
+            if preproc:
+                import json
+                def load_jsonl(filepath):
+                    data = []
+                    with open(filepath, 'r', encoding='utf-8') as file:
+                        for line in file:
+                            data.append(json.loads(line))
+                    return data
+                file = '/home/siyue/Projects/llm2vec_reason/preproc/theoremqa_theorems_problems_output.jsonl'
+                file = load_jsonl(file)
+                new_query = []
+                for row in file:
+                    q = row['response']['body']['choices'][0]['message']['content']
+                    if '**Final Answer**' in q:
+                        q = q.split('**Final Answer**')[0]
+                    indicators = ["**Theorem**","**theorem**"," Theorems\n",]
+                    for sep in indicators:
+                        if sep in q:
+                            q = q.split(sep)[-1]
+                            q = q.split('\n')
+                            q = [s for s in q if len(s.strip())>0]
+                            q = [s for s in q if re.search(r'boxed', s)==None and re.match(r'^[\\\[\]\{\}\d]+$', s)==None and 'answer' not in s.lower()]
+                            q = q[0]
+                            break
+                    else:
+                        q = 'NO THEOREM FOUND'
+                        print('ALARM: No theorem found!')
+                    new_query.append(q)
+                print(new_query)
+                assert len(new_query)==len(examples)
+
+                def modify_query(example):
+                    # Suppose new_query is a list or array of new values for the 'query' column
+                    example['query'] = new_query.pop(0)  # Modify the 'query' column
+                    return example
+                examples = examples.map(modify_query)
+                
 
             corpus[domain]["standard"] = {
                 e["id"]: {"text": e["content"]} for e in domain_corpus
@@ -158,9 +184,10 @@ class BrightStackflow(MultilingualTask, AbsTaskRetrieval):
         return corpus, queries, relevant_docs
 
     def load_data(self, **kwargs):
+
         if self.data_loaded:
             return
-
+        
         if 'preproc' in kwargs:
             preproc = kwargs['preproc']
         else:
