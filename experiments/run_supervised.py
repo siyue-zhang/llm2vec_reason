@@ -223,6 +223,9 @@ class DataTrainingArguments:
         default=False,
         metadata={"help": "Whether to use e5 data during training."},
     )
+    aug_file_path: Optional[str] = field(
+        default='/home/siyue/Projects/llm2vec_reason/augmentation/output/augmentation_data.jsonl',
+    )
 
 @dataclass
 class CustomArguments:
@@ -443,6 +446,7 @@ def main():
         file_path=data_args.dataset_file_path,
         effective_batch_size=training_args.per_device_train_batch_size,
         domain=data_args.domain,
+        aug_file_path=data_args.aug_file_path,
         task=data_args.task,
         add_e5=data_args.add_e5
         * accelerator.num_processes,

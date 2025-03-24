@@ -38,7 +38,7 @@ class E5Mix(Dataset):
         dataset_name: str = "E5Mix",
         split: str = "validation",
         file_path: str = "cache/echo-data",
-        aug_file_path: str = "/home/siyue/Projects/data-aug/output/augmentation_data.jsonl",
+        aug_file_path: str = "/home/siyue/Projects/llm2vec_reason/augmentation/output/augmentation_data.jsonl",
         effective_batch_size: int = 32,
         shuffle_individual_datasets: bool = True,
         separator: str = "!@#$%^&*()",
