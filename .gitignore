@@ -12,3 +12,4 @@ cluster_scripts/**
 backup/
 wandb/
 augmentation/output/
+ext3/
