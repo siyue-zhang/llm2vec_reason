@@ -12,3 +12,4 @@ backup/
 wandb/
 augmentation/output/
 ext3/
+results/
