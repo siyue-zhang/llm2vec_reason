@@ -1,6 +1,7 @@
 import pickle
 import ipdb
 import random
+import json
 
 from collections import defaultdict, Counter
 from itertools import permutations
@@ -8,6 +9,27 @@ from itertools import permutations
 import sys
 sys.path.append('../')
 from instances import *
+
+def load_jsonl(filepath):
+    data = []
+    with open(filepath, 'r', encoding='utf-8') as file:
+        for line in file:
+            data.append(json.loads(line))
+    return data
+
+file_path = '../gen_problem_solution/check_solution_input.jsonl'
+data_path = '../gen_problem_solution/check_problem_solution_tmp.jsonl'
+ids = [d['custom_id'] for d in load_jsonl(file_path)]
+
+before_problem_by_instance = defaultdict(list)
+for example in load_jsonl(data_path):
+    if str(example['id']) in ids:
+        instance = example['instance']
+        problem = example['problem']
+        if problem not in before_problem_by_instance[instance]:
+            before_problem_by_instance[instance].append(problem)
+
+
 
 filepath = "../gen_problem_solution/before_hard_negative_tmp.pkl"
 
@@ -71,6 +93,8 @@ for instance, pairs in pairs_by_instance.items():
     problems = [pair['problem'] for pair in pairs]
     solutions = [pair['solution'] for pair in pairs]
 
+    before_problems = before_problem_by_instance[instance]
+
     if len(problems) != len(list(set(problems))):
         unique_problems = []
         unique_solutions = []
@@ -83,24 +107,22 @@ for instance, pairs in pairs_by_instance.items():
 
     negatives_by_problem = defaultdict(list)
     negatives_instance_by_problem = defaultdict(list)
-    n_neg = len(problems)-1
-    for problem in problems:
+    n_neg =  len(before_problems)-1
+    for problem in before_problems:
         results, scores = definition_retriever.retrieve(bm25s.tokenize(problem), k=200)
         ids = results[0]
         for k, idx in enumerate(ids):
-            if k<skip:
+            if k<2:
                 continue
             if definition_instances[idx] == instance:
-                continue
-            if definition_instances[idx] in negatives_instance_by_problem[problem]:
                 continue
             negatives_by_problem[problem].append(definition_corpus[idx])
             negatives_instance_by_problem[problem].append(definition_instances[idx])
             if len(negatives_by_problem[problem])==n_neg:
                 break
     
-    for problem in problems:
-        flg = True
+    for problem in before_problems:
+        # while len(negatives_by_problem[problem])>0:
         n = negatives_by_problem[problem].pop(0)
         i = negatives_instance_by_problem[problem].pop(0)
         examples_by_task['p2i'].append({
@@ -109,8 +131,8 @@ for instance, pairs in pairs_by_instance.items():
             'question_type': question_type,
             'reference': reference,
             'user_query': problem,
-            'positive_document': definition if flg else instance,
-            'hard_negative_document': n if flg else i,
+            'positive_document': definition,
+            'hard_negative_document': n,
             'negative_instance': i,
         })
         # print(f'\n\nquery: \n{problem} \npos {flg}: \n{definition if flg else instance} \nneg: \n{n}\n{i}\n~~~~~~~')
@@ -503,8 +525,8 @@ def get_instruct_map(domain):
 for task, examples in examples_by_task.items():
 
     for example in examples:
-        # if task != 'i2s' or example['domain']=='finance formula':
-        #     continue
+        if task != 'p2i':
+            continue
         final = {
             'domain': example['domain'],
             'instance': example['instance'],
@@ -527,7 +549,7 @@ print(len(finals))
 
 
 import json
-file_path = '../output/augmentation_data.jsonl'
+file_path = '../output/augmentation_data_p2i.jsonl'
 with open(file_path, 'w', encoding='utf-8') as f:
     for request in finals:
         f.write(json.dumps(request) + '\n')

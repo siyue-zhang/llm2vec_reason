@@ -190,6 +190,9 @@ class E5Mix(Dataset):
             if self.task != 'all' and augment_sample['task_type'] != self.task:
                 continue
 
+            # if self.task == 'all' and augment_sample['task_type'] in ['ps2ps']:
+            #     continue
+
             instruction = augment_sample["task"]
             query = f"{instruction}; " + self.separator + augment_sample["user_query"]
             pos = self.separator + augment_sample["positive_document"]
