@@ -1,6 +1,7 @@
 import json
 import random
 import os
+from copy import deepcopy
 from collections import defaultdict
 
 from .dataset import DataSample, TrainSample, Dataset
@@ -190,6 +191,24 @@ class E5Mix(Dataset):
             if self.task != 'all' and augment_sample['task_type'] != self.task:
                 continue
 
+            # if self.task == 'p2i':
+            #     r = random.random()
+            #     if r < 0.5:
+            #         # print(augment_sample['user_query'])
+            #         ori = deepcopy(augment_sample["positive_document"])
+            #         augment_sample["positive_document"] = ori.split('**Definition**')[0]
+            #         # print(augment_sample["positive_document"])
+            #         ori = deepcopy(augment_sample["hard_negative_document"])
+            #         augment_sample["hard_negative_document"] = ori.split('**Definition**')[0]
+            #         # print(augment_sample["hard_negative_document"])
+                    
+                    # ori = deepcopy(augment_sample["user_query"])
+                    # ins = augment_sample["instance"]
+                    # ori = ori.split('. ')
+                    # random_index = random.randint(0, len(ori))
+                    # ori.insert(random_index, ins)
+                    # augment_sample["user_query"] = '. '.join(ori)
+                
             # if self.task == 'all' and augment_sample['task_type'] in ['ps2ps']:
             #     continue
 

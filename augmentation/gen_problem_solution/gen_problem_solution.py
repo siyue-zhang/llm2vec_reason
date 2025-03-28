@@ -34,7 +34,10 @@ def generate_problem_solution_prompt(question_type, domain, instance, ref):
     elif question_type!='math':
         add = '\nThe problem should be based on real life human activities.' if random.random() < 0.5 else ''
         prompt += f"The problem should be new and unique, not similar to common existing problems.{add}\n"
-        prompt += f"The problem should test about the {domain}: {instance}, without explicitly mentioning {instance}.\n"
+        if random.random() > 0.4:
+            prompt += f"The problem should test about the {domain}: {instance}, without explicitly mentioning {instance}.\n"
+        else:
+            prompt += f"The problem should test about the {domain}: {instance}.\n"
         if random.random() > 0.4:
             add = random.choice(ref)
             prompt += f"The problem should be as difficult as {add}.\n"
@@ -50,7 +53,10 @@ def generate_problem_solution_prompt(question_type, domain, instance, ref):
         options += options[-1]
         add = random.choice(options) 
         prompt += f"The problem should be new and unique, not similar to common existing problems.{add}\n"
-        prompt += f"The problem should test about the {domain}: {instance}, without explicitly mentioning {instance}.\n"
+        if random.random() > 0.4:
+            prompt += f"The problem should test about the {domain}: {instance}, without explicitly mentioning {instance}.\n"
+        else:
+            prompt += f"The problem should test about the {domain}: {instance}.\n"
         if random.random() > 0.2:
             add = random.choice(ref)
             prompt += f"The problem should be as difficult as {add}.\n"

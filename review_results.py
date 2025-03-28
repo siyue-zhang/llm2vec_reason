@@ -2,7 +2,7 @@ import json
 import numpy as np
 import re
 
-subset = 'aops'
+subset = 'leetcode'
 
 def load_json(file_path):
     """Load and return data from a JSON file."""
@@ -23,8 +23,8 @@ def load_jsonl(filepath):
             data.append(json.loads(line))
     return data
         
-doc_file = '/home/siyue/Projects/llm2vec_reason/simcse_e5_aug_v3.5_aops/BrightAops_aops_predictions_doc.json'
-file = '/home/siyue/Projects/llm2vec_reason/simcse_e5_aug_v3.5_aops/BrightAops_aops_predictions.json'
+doc_file = '/home/siyue/Projects/llm2vec_reason/results/in_domain/supervised_leetcode_all_v0.1_3500/BrightLeetcode_leetcode_predictions_doc.json'
+file = '/home/siyue/Projects/llm2vec_reason/results/in_domain/supervised_leetcode_all_v0.1_3500/BrightLeetcode_leetcode_predictions.json'
 
 doc_file = load_json(doc_file)
 file = load_json(file)
@@ -60,9 +60,9 @@ for row in preproc_file:
         print('ALARM: No theorem found!')
     new_query.append(q)
 
-topk = 10
+topk = 5
 count = 0
-tops = 3
+tops = 1
 scount = 0
 for example, preproc_query in zip(data_examples, new_query):
     scount+=1
@@ -75,7 +75,7 @@ for example, preproc_query in zip(data_examples, new_query):
     retrieved_id_score = sort_dict_by_value_desc(retrieved_id_score)
     retrieved = doc_file[query_id]
     gold_ids = retrieved['gold']
-    print('preproc_query: ', preproc_query, '\n')
+    # print('preproc_query: ', preproc_query, '\n')
     print('golds:\n', '\n '.join([k for k in gold_ids]), '\n')
     for doc_id in retrieved_id_score:
         count += 1

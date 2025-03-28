@@ -107,14 +107,16 @@ for instance, pairs in pairs_by_instance.items():
 
     negatives_by_problem = defaultdict(list)
     negatives_instance_by_problem = defaultdict(list)
-    n_neg =  len(before_problems)-1
+    n_neg = 1
     for problem in before_problems:
         results, scores = definition_retriever.retrieve(bm25s.tokenize(problem), k=200)
         ids = results[0]
         for k, idx in enumerate(ids):
-            if k<2:
+            if k<3:
                 continue
             if definition_instances[idx] == instance:
+                continue
+            if get_domain_by_instance[definition_instances[idx]] != get_domain_by_instance[instance]:
                 continue
             negatives_by_problem[problem].append(definition_corpus[idx])
             negatives_instance_by_problem[problem].append(definition_instances[idx])
@@ -122,19 +124,19 @@ for instance, pairs in pairs_by_instance.items():
                 break
     
     for problem in before_problems:
-        # while len(negatives_by_problem[problem])>0:
-        n = negatives_by_problem[problem].pop(0)
-        i = negatives_instance_by_problem[problem].pop(0)
-        examples_by_task['p2i'].append({
-            'instance': instance,
-            'domain': domain,
-            'question_type': question_type,
-            'reference': reference,
-            'user_query': problem,
-            'positive_document': definition,
-            'hard_negative_document': n,
-            'negative_instance': i,
-        })
+        while len(negatives_by_problem[problem])>0:
+            n = negatives_by_problem[problem].pop(0)
+            i = negatives_instance_by_problem[problem].pop(0)
+            examples_by_task['p2i'].append({
+                'instance': instance,
+                'domain': domain,
+                'question_type': question_type,
+                'reference': reference,
+                'user_query': problem,
+                'positive_document': definition,
+                'hard_negative_document': n,
+                'negative_instance': i,
+            })
         # print(f'\n\nquery: \n{problem} \npos {flg}: \n{definition if flg else instance} \nneg: \n{n}\n{i}\n~~~~~~~')
 
     print('p2i ', len(examples_by_task['p2i']))
@@ -525,8 +527,13 @@ def get_instruct_map(domain):
 for task, examples in examples_by_task.items():
 
     for example in examples:
-        if task != 'p2i':
+        if task not in ['p2i','p2ps']:
             continue
+        if example['domain'] in ['data structure','algorithm','finance formula']:
+            continue
+        if example['domain']=='physics theorem':
+            if random.random() > 0.2:
+                continue
         final = {
             'domain': example['domain'],
             'instance': example['instance'],
@@ -549,7 +556,7 @@ print(len(finals))
 
 
 import json
-file_path = '../output/augmentation_data_p2i.jsonl'
+file_path = '../output/augmentation_data.jsonl'
 with open(file_path, 'w', encoding='utf-8') as f:
     for request in finals:
         f.write(json.dumps(request) + '\n')
