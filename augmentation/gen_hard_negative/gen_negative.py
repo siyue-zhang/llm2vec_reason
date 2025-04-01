@@ -5,6 +5,7 @@ import json
 
 from collections import defaultdict, Counter
 from itertools import permutations
+from copy import deepcopy
 
 import sys
 sys.path.append('../')
@@ -86,6 +87,7 @@ for instance, pairs in pairs_by_instance.items():
     domain = pairs[0]['domain']
     question_type = pairs[0]['question_type']
     reference = pairs[0]['reference']
+    language = pairs[0]['language']
 
     # p2i: theoremqa_theorems
 
@@ -107,12 +109,12 @@ for instance, pairs in pairs_by_instance.items():
 
     negatives_by_problem = defaultdict(list)
     negatives_instance_by_problem = defaultdict(list)
-    n_neg = 1
+    n_neg = 5
     for problem in before_problems:
         results, scores = definition_retriever.retrieve(bm25s.tokenize(problem), k=200)
         ids = results[0]
         for k, idx in enumerate(ids):
-            if k<3:
+            if k<2:
                 continue
             if definition_instances[idx] == instance:
                 continue
@@ -127,13 +129,25 @@ for instance, pairs in pairs_by_instance.items():
         while len(negatives_by_problem[problem])>0:
             n = negatives_by_problem[problem].pop(0)
             i = negatives_instance_by_problem[problem].pop(0)
+            d = deepcopy(definition)
+            if random.random() < 0.8:
+                nc = n.split('**Definition**')[0].replace('**Concept**','').strip()
+                nf = n.split('**Definition**')[1]
+                dc = d.split('**Definition**')[0].replace('**Concept**','').strip()
+                df = d.split('**Definition**')[1]
+                if random.random() < 0.5:
+                    d=df
+                    n=nf
+                else:
+                    d=dc
+                    n=nc
             examples_by_task['p2i'].append({
                 'instance': instance,
                 'domain': domain,
                 'question_type': question_type,
                 'reference': reference,
                 'user_query': problem,
-                'positive_document': definition,
+                'positive_document': d,
                 'hard_negative_document': n,
                 'negative_instance': i,
             })
@@ -220,12 +234,12 @@ for instance, pairs in pairs_by_instance.items():
         n = negatives_problem_by_problem[query_problem].pop(0)
         ns = negatives_solution_by_problem[query_problem].pop(0)
         neg_instance = negatives_instance_by_problem[query_problem].pop(0)
-        if domain in ['algorithm', 'data structure']:
-            pos = ps
-            neg = ns
-        else:
-            pos = p+'\n'+ps
-            neg = n+'\n'+ns
+        # if domain in ['algorithm', 'data structure']:
+        #     pos = ps
+        #     neg = ns
+        # else:
+        pos = p+'\n'+ps
+        neg = n+'\n'+ns
         res = {
             'instance': instance,
             'domain': domain,
@@ -282,12 +296,12 @@ for instance, pairs in pairs_by_instance.items():
         n = negatives_problem_by_problem[query_problem].pop(0)
         ns = negatives_solution_by_problem[query_problem].pop(0)
         neg_instance = negatives_instance_by_problem[query_problem].pop(0)
-        if domain in ['algorithm', 'data structure']:
-            pos = ps
-            neg = ns
-        else:
-            pos = p+'\n'+ps
-            neg = n+'\n'+ns
+        # if domain in ['algorithm', 'data structure']:
+        #     pos = ps
+        #     neg = ns
+        # else:
+        pos = p+'\n'+ps
+        neg = n+'\n'+ns
         res = {
             'instance': instance,
             'domain': domain,
@@ -413,7 +427,7 @@ for instance, pairs in pairs_by_instance.items():
         negatives = []
         negatives_problem = []
         negatives_instance = []
-        n_neg = 20*len(solutions)
+        n_neg = len(solutions)
         for k, idx in enumerate(ids):
             if k<skip:
                 continue
@@ -429,24 +443,24 @@ for instance, pairs in pairs_by_instance.items():
             if len(negatives)==n_neg:
                 break
 
-
+        idx = list(range(len(solutions)))
         for neg_solution, neg_instance, neg_problem in zip(negatives, negatives_instance, negatives_problem):
-            flg = random.random() < 0.2
-            k = random.choice(range(len(solutions)))
+            index = random.choice(range(len(idx)))
+            k = idx.pop(index)
             pos_problem = problems[k]
             pos_solution = solutions[k]
-            if domain in ['algorithm', 'data structure']:
-                pos = pos_solution
-                neg = neg_solution
-            else:
-                pos = pos_problem+'\n'+pos_solution
-                neg = neg_problem+'\n'+neg_problem
+            # if domain in ['algorithm', 'data structure']:
+            #     pos = pos_solution
+            #     neg = neg_solution
+            # else:
+            pos = pos_problem+'\n'+pos_solution
+            neg = neg_problem+'\n'+neg_problem
             res = {
                 'instance': instance,
                 'domain': domain,
                 'question_type': question_type,
                 'reference': reference,
-                'user_query': definition if flg else instance,
+                'user_query': instance,
                 'positive_document': pos,
                 'hard_negative_document': neg,
                 'negative_instance': neg_instance,
@@ -524,16 +538,39 @@ def get_instruct_map(domain):
     }
     return instruct_map
 
+F = ["Binomial Model in finance",
+    "Future Value (FV) Formula",
+    "Present Value (PV) Formula",
+    "Discounted Cash Flow (DCF) Model",
+    "Z-Spread Formula",
+    "Sharpe Ratio",
+    "Payback Period Formula"]
+
+
 for task, examples in examples_by_task.items():
 
     for example in examples:
-        if task not in ['p2i','p2ps']:
+        # if task not in ['p2i','p2ps']:
+        #     continue
+        # if example['domain'] in ['data structure','algorithm','finance formula']:
+        #     continue
+        if example['domain']=='physics theorem' and random.random() > 0.2:
             continue
-        if example['domain'] in ['data structure','algorithm','finance formula']:
+        if task =='p2ps' and random.random() > 0.7:
             continue
-        if example['domain']=='physics theorem':
-            if random.random() > 0.2:
-                continue
+        if task == 'ps2ps' and random.random() > 0.3:
+            continue
+        if example['domain']=='finance formula' and example['instance'] not in F:
+            continue
+
+        # if example['domain'] not in ['algorithm', 'data structure']:
+        #     continue
+        # if task != 'p2ps':
+        #     continue
+
+        if task not in ['p2i','i2ps']:
+            continue
+
         final = {
             'domain': example['domain'],
             'instance': example['instance'],
@@ -556,7 +593,7 @@ print(len(finals))
 
 
 import json
-file_path = '../output/augmentation_data.jsonl'
+file_path = '../output/augmentation_data_p2i.jsonl'
 with open(file_path, 'w', encoding='utf-8') as f:
     for request in finals:
         f.write(json.dumps(request) + '\n')

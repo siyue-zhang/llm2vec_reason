@@ -83,6 +83,7 @@ class BrightPony(MultilingualTask, AbsTaskRetrieval):
         eval_splits: list,
         cache_dir: str = None,
         revision: str = None,
+        preproc: bool = False,
     ):
         corpus = {domain: {split: None for split in eval_splits} for domain in DOMAINS}
         queries = {domain: {split: None for split in eval_splits} for domain in DOMAINS}
@@ -167,11 +168,17 @@ class BrightPony(MultilingualTask, AbsTaskRetrieval):
         if self.data_loaded:
             return
 
+        if 'preproc' in kwargs:
+            preproc = kwargs['preproc']
+        else:
+            preproc = False
+
         self.corpus, self.queries, self.relevant_docs = self.load_bright_data(
             path=self.metadata_dict["dataset"]["path"],
             domains=DOMAINS,
             eval_splits=self.metadata_dict["eval_splits"],
             cache_dir=kwargs.get("cache_dir", None),
             revision=self.metadata_dict["dataset"]["revision"],
+            preproc=preproc,
         )
         self.data_loaded = True

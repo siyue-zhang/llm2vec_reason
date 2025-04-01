@@ -144,7 +144,8 @@ class BrightTheoremqaTheorems(MultilingualTask, AbsTaskRetrieval):
                         q = 'NO THEOREM FOUND'
                         print('ALARM: No theorem found!')
                     new_query.append(q)
-                print(new_query)
+                    print(q)
+
                 assert len(new_query)==len(examples)
 
                 def modify_query(example):

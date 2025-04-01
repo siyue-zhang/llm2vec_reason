@@ -320,7 +320,6 @@ class LLM2VecSupervisedTrainer(Trainer):
         features, labels = inputs
         q_reps = self.model(features[0])
         d_reps = self.model(features[1])
-
         d_reps_neg = None
         if len(features) > 2:
             d_reps_neg = self.model(features[2])

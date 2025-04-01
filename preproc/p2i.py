@@ -14,7 +14,8 @@ data_examples = load_dataset("xlangai/BRIGHT", "examples")
 #         doc_lookup[doc_id] = doc_text
 
 # subset = 'theoremqa_theorems'
-subset = 'aops'
+# subset = 'aops'
+subset = 'theoremqa_questions'
 query = data_examples[subset]['query']
 
 requests=[]
@@ -147,7 +148,7 @@ Following the above format, write the solution after **Solution** and theorem na
 {q}
 """
 
-    ls = {'aops':5000, 'theoremqa_theorems':5000}
+    ls = {'aops':5000, 'theoremqa_theorems':5000,'theoremqa_questions':5000}
 
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},

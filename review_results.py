@@ -22,9 +22,11 @@ def load_jsonl(filepath):
         for line in file:
             data.append(json.loads(line))
     return data
-        
-doc_file = '/home/siyue/Projects/llm2vec_reason/results/in_domain/supervised_leetcode_all_v0.1_3500/BrightLeetcode_leetcode_predictions_doc.json'
-file = '/home/siyue/Projects/llm2vec_reason/results/in_domain/supervised_leetcode_all_v0.1_3500/BrightLeetcode_leetcode_predictions.json'
+
+doc_file = '/home/siyue/Projects/llm2vec_reason/results/all_domain/simcse_new_leetcode_2498/BrightLeetcode_leetcode_predictions_doc.json'
+file = '/home/siyue/Projects/llm2vec_reason/results/all_domain/simcse_new_leetcode_2498/BrightLeetcode_leetcode_predictions.json'
+# doc_file = '/home/siyue/Projects/llm2vec_reason/results/simcse/leetcode/BrightLeetcode_leetcode_predictions_doc.json'
+# file = '/home/siyue/Projects/llm2vec_reason/results/simcse/leetcode/BrightLeetcode_leetcode_predictions.json'
 
 doc_file = load_json(doc_file)
 file = load_json(file)
@@ -64,7 +66,9 @@ topk = 5
 count = 0
 tops = 1
 scount = 0
-for example, preproc_query in zip(data_examples, new_query):
+for t, (example, preproc_query) in enumerate(zip(data_examples, new_query)):
+    if t<20:
+        continue
     scount+=1
     print('---------')
     query_id = example['id']
@@ -79,6 +83,7 @@ for example, preproc_query in zip(data_examples, new_query):
     print('golds:\n', '\n '.join([k for k in gold_ids]), '\n')
     for doc_id in retrieved_id_score:
         count += 1
+        print('===')
         print('doc id: ', doc_id, '  |  is gold' if doc_id in gold_ids else 'x' ,'\nscore: ', np.round(retrieved_id_score[doc_id],4))
         print(retrieved['retrieved'][doc_id]['content']['text'],'\n')
 

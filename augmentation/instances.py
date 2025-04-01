@@ -292,8 +292,11 @@ list_physics_theorem = [
 list_finance_formula = [
 #####
     "Binomial Model in finance",
-#####
+    "Net Present Value (NPV)",
+    "Future Value (FV) Formula",
+    "Present Value (PV) Formula",
     "Discounted Cash Flow (DCF) Model",
+#####
     "Black-Scholes Model",
     "Capital Asset Pricing Model (CAPM)",
     "Gordon Growth Model (GGM)",
@@ -306,12 +309,9 @@ list_finance_formula = [
     "Treynor Ratio",
     "Jensen's Alpha",
     "Weighted Average Cost of Capital (WACC)",
-    "Net Present Value (NPV)",
     "Internal Rate of Return (IRR)",
     "Profitability Index (PI)",
     "Payback Period Formula",
-    "Future Value (FV) Formula",
-    "Present Value (PV) Formula",
     "Dividend Discount Model (DDM)",
     "Holt-Winters Exponential Smoothing",
     "Monte Carlo Simulation for Finance",

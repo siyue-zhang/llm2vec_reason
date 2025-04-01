@@ -95,7 +95,7 @@ class BrightLeetcode(MultilingualTask, AbsTaskRetrieval):
             domain_corpus = datasets.load_dataset(
                 path, "documents", split=domain, cache_dir=cache_dir, revision=revision
             )
-
+            
             # TEMP
             # domain_corpus = domain_corpus.select(range(100))
             

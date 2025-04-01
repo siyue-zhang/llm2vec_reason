@@ -124,27 +124,14 @@ class BrightTheoremqaQuestions(MultilingualTask, AbsTaskRetrieval):
                         for line in file:
                             data.append(json.loads(line))
                     return data
-                file = '/home/siyue/Projects/llm2vec_reason/preproc/theoremqa_theorems_problems_output.jsonl'
+                file = '/home/siyue/Projects/llm2vec_reason/preproc/theoremqa_questions_problems_output.jsonl'
                 file = load_jsonl(file)
                 new_query = []
-                for row in file:
+                for ex, row in zip(examples, file):
                     q = row['response']['body']['choices'][0]['message']['content']
-                    if '**Final Answer**' in q:
-                        q = q.split('**Final Answer**')[0]
-                    indicators = ["**Theorem**","**theorem**"," Theorems\n",]
-                    for sep in indicators:
-                        if sep in q:
-                            q = q.split(sep)[-1]
-                            q = q.split('\n')
-                            q = [s for s in q if len(s.strip())>0]
-                            q = [s for s in q if re.search(r'boxed', s)==None and re.match(r'^[\\\[\]\{\}\d]+$', s)==None and 'answer' not in s.lower()]
-                            q = q[0]
-                            break
-                    else:
-                        q = 'NO THEOREM FOUND'
-                        print('ALARM: No theorem found!')
+                    query = ex['query']
+                    q = query + '\n' + q
                     new_query.append(q)
-                print(new_query)
                 assert len(new_query)==len(examples)
 
                 def modify_query(example):

@@ -85,11 +85,13 @@ print('\n')
 
 
 def extract_code(text):
-    pattern = re.compile(r'```(python|java|cpp)(.*?)```', re.DOTALL)
+    pattern = re.compile(r'```(python|java|cpp)?\n(.*?)```', re.DOTALL)
     matches = pattern.findall(text)
+    
     if not matches:
-        return text
-    return '\n'.join(code for _, code in matches).strip()
+        return text, None
+    
+    return matches[0][1], matches[0][0]
 
 from collections import defaultdict
 pairs_by_instance = defaultdict(list)
@@ -98,7 +100,8 @@ solution_by_instance = defaultdict(list)
 for pair in all_pairs:
     instance = pair['instance']
     problem = pair['problem']
-    pair['solution'] = extract_code(pair['solution'])
+    pair['solution'], pair['language'] = extract_code(pair['solution'])
+    domain = pair['domain']
     solution = pair['solution']
     pair['definition'] = definition_by_instance[instance]
     pairs_by_instance[instance].append(pair)

@@ -52,6 +52,7 @@ class E5Mix(Dataset):
         self.effective_batch_size = effective_batch_size
         self.shuffle_individual_datasets = shuffle_individual_datasets
         self.separator = separator
+
         # NEW
         self.aug_file_path = aug_file_path
         self.domain = domain
@@ -131,8 +132,8 @@ class E5Mix(Dataset):
 
             # equalize size for each one
             for dataset in data_map:
-                if len(data_map[dataset])>20000:
-                    data_map[dataset] = random.sample(data_map[dataset],20000)
+                if len(data_map[dataset])>3000:
+                    data_map[dataset] = random.sample(data_map[dataset],3000)
                 # print(dataset, len(data_map[dataset]))
 
             if self.shuffle_individual_datasets:
@@ -244,7 +245,7 @@ class E5Mix(Dataset):
         logger.info(f"Loaded {len(self.data)*self.effective_batch_size} augmented samples.")
         
         if self.add_e5:
-            e5 = random.sample(all_batches, int(40000/self.effective_batch_size))
+            e5 = random.sample(all_batches, int(30000/self.effective_batch_size))
             tmp = []
             for batch in e5:
                 tmp.append([all_samples[idx] for idx in batch])
