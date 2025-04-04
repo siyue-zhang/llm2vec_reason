@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Define variables
-# PEFT_MODEL_PATH="/home/siyue/Projects/llm2vec_reason/output/supervised/Meta-Llama-3-8B-Instruct-mntp-supervised-new-v0.1/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-24_l-4096_bidirectional-True_e-1_s-42_w-300_lr-0.0001_lora_r-16/checkpoint-2498"
+PEFT_MODEL_PATH="./output/qwen/Qwen2.5-7B-Instruct-mntp-unsup-simcse/checkpoint-1000"
+BASE_MODEL="Qwen/Qwen2.5-7B-Instruct"
 BATCH_SIZE=20
 
 # torchrun --nproc_per_node=4 experiments/run_supervised.py train_configs/supervised/MetaLlama3.json
@@ -24,11 +25,11 @@ BATCH_SIZE=20
 #     --output_dir "results/in_domain/supervised_leetcode_v1.0_200" \
 #     --batch_size "$BATCH_SIZE"
 
-python experiments/mteb_eval_custom.py \
-    --peft_model_name_or_path "/home/siyue/Projects/llm2vec_reason/output/simcse/Meta-Llama-3-8B-Instruct-mntp-simcse-leetcode-v1.0-hard/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-32_l-4096_bidirectional-True_e-10_s-42_w-50_lr-0.0001_lora_r-16/checkpoint-210" \
-    --task_name "BrightLeetcode" \
-    --output_dir "results/in_domain/simcse_leetcode_v1.0_hard_210" \
-    --batch_size "$BATCH_SIZE"
+# python experiments/mteb_eval_custom.py \
+#     --peft_model_name_or_path "/home/siyue/Projects/llm2vec_reason/output/simcse/Meta-Llama-3-8B-Instruct-mntp-simcse-leetcode-v1.0-hard/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-32_l-4096_bidirectional-True_e-10_s-42_w-50_lr-0.0001_lora_r-16/checkpoint-210" \
+#     --task_name "BrightLeetcode" \
+#     --output_dir "results/in_domain/simcse_leetcode_v1.0_hard_210" \
+#     --batch_size "$BATCH_SIZE"
 
 # python experiments/mteb_eval_custom.py \
 #     --peft_model_name_or_path "/home/siyue/Projects/llm2vec_reason/output/simcse/Meta-Llama-3-8B-Instruct-mntp-simcse-leetcode-v1.0/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-32_l-4096_bidirectional-True_e-3_s-42_w-50_lr-0.0001_lora_r-16/checkpoint-741" \
@@ -37,23 +38,26 @@ python experiments/mteb_eval_custom.py \
 #     --batch_size "$BATCH_SIZE"
 
 # # Run the command
-# python experiments/mteb_eval_custom.py \
-#     --peft_model_name_or_path "$PEFT_MODEL_PATH" \
-#     --task_name "BrightTheoremqaTheorems" \
-#     --output_dir "results/all_domain/supervised_new_theoremqa_theorems_2498" \
-#     --batch_size "$BATCH_SIZE"
+python experiments/mteb_eval_custom.py \
+    --peft_model_name_or_path "$PEFT_MODEL_PATH" \
+    --task_name "BrightTheoremqaTheorems" \
+    --base_model_name_or_path "$BASE_MODEL"\
+    --output_dir "qwen_results/simcse/theoremqa_theorems" \
+    --batch_size "$BATCH_SIZE"
 
-# python experiments/mteb_eval_custom.py \
-#     --peft_model_name_or_path "$PEFT_MODEL_PATH" \
-#     --task_name "BrightTheoremqaQuestions" \
-#     --output_dir "results/all_domain/supervised_new_theoremqa_questions_2498" \
-#     --batch_size "$BATCH_SIZE"
+python experiments/mteb_eval_custom.py \
+    --peft_model_name_or_path "$PEFT_MODEL_PATH" \
+    --task_name "BrightTheoremqaQuestions" \
+    --base_model_name_or_path "$BASE_MODEL"\
+    --output_dir "qwen_results/simcse/theoremqa_questions" \
+    --batch_size "$BATCH_SIZE"
 
-# python experiments/mteb_eval_custom.py \
-#     --peft_model_name_or_path "$PEFT_MODEL_PATH" \
-#     --task_name "BrightAops" \
-#     --output_dir "results/all_domain/supervised_new_aops_2498" \
-#     --batch_size "$BATCH_SIZE"
+python experiments/mteb_eval_custom.py \
+    --peft_model_name_or_path "$PEFT_MODEL_PATH" \
+    --base_model_name_or_path "$BASE_MODEL"\
+    --task_name "BrightAops" \
+    --output_dir "qwen_results/simcse/aops" \
+    --batch_size "$BATCH_SIZE"
 
 # python experiments/mteb_eval_custom.py \
 #     --peft_model_name_or_path "$PEFT_MODEL_PATH" \
@@ -61,11 +65,12 @@ python experiments/mteb_eval_custom.py \
 #     --output_dir "results/all_domain/supervised_new_pony_2498" \
 #     --batch_size "$BATCH_SIZE"
 
-# python experiments/mteb_eval_custom.py \
-#     --peft_model_name_or_path "$PEFT_MODEL_PATH" \
-#     --task_name "BrightLeetcode" \
-#     --output_dir "results/all_domain/supervised_new_leetcode_2498" \
-#     --batch_size "$BATCH_SIZE"
+python experiments/mteb_eval_custom.py \
+    --base_model_name_or_path "$BASE_MODEL"\
+    --peft_model_name_or_path "$PEFT_MODEL_PATH" \
+    --task_name "BrightLeetcode" \
+    --output_dir "qwen_results/simcse/leetcode" \
+    --batch_size "$BATCH_SIZE"
 
 # python experiments/mteb_eval_custom.py \
 #     --peft_model_name_or_path "$PEFT_MODEL_PATH" \
