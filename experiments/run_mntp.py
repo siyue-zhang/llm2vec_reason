@@ -20,6 +20,8 @@ The script is adapted from https://github.com/huggingface/transformers/blob/51bc
 import logging
 import math
 import os
+os.environ["WANDB_PROJECT"] = "Qwen"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
 import sys
 import warnings
 from dataclasses import dataclass, field

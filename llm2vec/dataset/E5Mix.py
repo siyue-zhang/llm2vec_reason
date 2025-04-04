@@ -191,7 +191,9 @@ class E5Mix(Dataset):
             # task filter
             if self.task != 'all' and augment_sample['task_type'] != self.task:
                 continue
-
+            # only keep hard leetcode
+            if augment_sample['negative_instance'] != 'unknown':
+                continue
             # if self.task == 'p2i':
             #     r = random.random()
             #     if r < 0.5:
@@ -236,6 +238,10 @@ class E5Mix(Dataset):
                     random_index = random.randint(0, len(self.all_samples[dataset]) - 1)
                     popped_items.append(self.all_samples[dataset].pop(random_index))
                 self.data.append(popped_items)
+                # for x in popped_items:
+                #     print(x)
+                #     print('----')
+                # assert 1==2
             print(dataset, ' : ', len(popped_items), ' samples.')
 
         random.shuffle(self.data)

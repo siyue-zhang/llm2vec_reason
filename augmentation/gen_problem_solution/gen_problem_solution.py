@@ -13,7 +13,7 @@ def pick_language():
         return random.choices(instances, weights=probabilities, k=1)[0]
 
     instances = ['Python', 'Java', 'C++']
-    probabilities = [0.6, 0.2, 0.2]
+    probabilities = [1, 0, 0]
     chosen_instance = weighted_random_choice(instances, probabilities)
 
     return chosen_instance
@@ -86,26 +86,27 @@ def generate_requests():
         list_instances = domains[domain]
         question_type = domain_question_mapping[domain]
         ref = example_datasets[domain]
-        for instance in list_instances:
-            counter += 1
-            count_domains.append(domain)
-            prompt = generate_problem_solution_prompt(question_type, domain, instance, ref)
-            # if random.random() < 0.1:
-            #     print(prompt)
-            messages = [
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
-            ]
-            requests.append({
-                "custom_id": f"request-{counter}", 
-                "method": "POST", 
-                "url": "/v1/chat/completions", 
-                "body": 
-                    {"model": "gpt-4o-mini",
-                    # "temperature": 0.7,
-                    "messages": messages,
-                    "max_tokens": 2000},
-            })
+        if question_type=='coding':
+            for instance in list_instances:
+                counter += 1
+                count_domains.append(domain)
+                prompt = generate_problem_solution_prompt(question_type, domain, instance, ref)
+                # if random.random() < 0.1:
+                #     print(prompt)
+                messages = [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": prompt}
+                ]
+                requests.append({
+                    "custom_id": f"request-{counter}", 
+                    "method": "POST", 
+                    "url": "/v1/chat/completions", 
+                    "body": 
+                        {"model": "gpt-4o-mini",
+                        # "temperature": 0.7,
+                        "messages": messages,
+                        "max_tokens": 2000},
+                })
     print(Counter(count_domains))
     return requests
 
@@ -115,7 +116,7 @@ for k in range(K):
     # if k<4:
     #     continue
     requests =  generate_requests()
-    file_path = f'./inputs/problem_solution_input_{k+1}.jsonl'
+    file_path = f'./inputs_leetcode/problem_solution_input_{k+1}_leetcode.jsonl'
     with open(file_path, 'w', encoding='utf-8') as f:
         for request in requests:
             f.write(json.dumps(request) + '\n')

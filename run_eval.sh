@@ -25,12 +25,16 @@ BATCH_SIZE=20
 #     --batch_size "$BATCH_SIZE"
 
 python experiments/mteb_eval_custom.py \
-    --peft_model_name_or_path "McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp-unsup-simcse" \
+    --peft_model_name_or_path "/home/siyue/Projects/llm2vec_reason/output/simcse/Meta-Llama-3-8B-Instruct-mntp-simcse-leetcode-v1.0-hard/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-32_l-4096_bidirectional-True_e-10_s-42_w-50_lr-0.0001_lora_r-16/checkpoint-210" \
     --task_name "BrightLeetcode" \
-    --output_dir "results/simcse/leetcode" \
+    --output_dir "results/in_domain/simcse_leetcode_v1.0_hard_210" \
     --batch_size "$BATCH_SIZE"
 
-
+# python experiments/mteb_eval_custom.py \
+#     --peft_model_name_or_path "/home/siyue/Projects/llm2vec_reason/output/simcse/Meta-Llama-3-8B-Instruct-mntp-simcse-leetcode-v1.0/E5Mix_train_m-Meta-Llama-3-8B-Instruct_p-mean_b-32_l-4096_bidirectional-True_e-3_s-42_w-50_lr-0.0001_lora_r-16/checkpoint-741" \
+#     --task_name "BrightLeetcode" \
+#     --output_dir "results/in_domain/simcse_leetcode_v1.0_741" \
+#     --batch_size "$BATCH_SIZE"
 
 # # Run the command
 # python experiments/mteb_eval_custom.py \

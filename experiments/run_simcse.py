@@ -1,6 +1,8 @@
 import logging
 from dataclasses import dataclass, field
 import os
+os.environ["WANDB_PROJECT"] = "Qwen"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
 import sys
 from typing import Any, Dict, List, Optional, Tuple, Union
 
